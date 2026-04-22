@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>SAE2.03 ADMIN</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/base.css" />
+  </head>
+  <body>
+    <section id="log"></section>
+
+    <script type="module">
+      import { Log } from "./component/Log/script.js";
+
+      window.C = {};
+
+      C.start = function () {
+        V.renderLog("Démarrage de l'application");
+      };
+
+      window.V = {};
+
+      V.renderLog = function (txt) {
+        let content = document.querySelector("#log");
+        content.innerHTML = Log.format(txt);
+      };
+
+      C.start();
+    </script>
+  </body>
+</html>

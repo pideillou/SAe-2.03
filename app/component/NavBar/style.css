@@ -1,0 +1,21 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 3rem;
+  color: var(--color-fg);
+  background-color: var(--color-bg);
+
+  .navbar__item {
+    --_offset: 0.2rem;
+    padding: 0.5rem 1rem;
+    text-decoration: underline;
+    text-decoration-thickness: 0.1rem;
+    text-underline-offset: var(--_offset);
+    cursor: pointer;
+    transition: text-underline-offset 0.2s ease-in-out;
+    &:hover {
+      --_offset: 0.5rem;
+    }
+  }
+}
