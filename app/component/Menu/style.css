@@ -1,3 +1,13 @@
+.no-movie-msg {
+  color: #fff;
+  background: #222;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.2rem;
+  margin: 2rem auto;
+  grid-column: 1/-1;
+}
 .movie-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

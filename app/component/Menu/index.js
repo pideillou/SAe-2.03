@@ -32,8 +32,14 @@ const grid = document.getElementById("movieGrid");
 if (grid) {
 	DataMovie.requestMovies().then(movies => {
 		grid.innerHTML = "";
+		if (!movies || movies.length === 0) {
+			const msg = document.createElement("div");
+			msg.className = "no-movie-msg";
+			msg.textContent = "Oups, aucun film n’est disponible !";
+			grid.appendChild(msg);
+			return;
+		}
 		movies.forEach(movie => {
-			console.log("Film reçu:", movie);
 			grid.appendChild(createMovieCard(movie));
 		});
 	});
