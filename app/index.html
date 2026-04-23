@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./component/Menu/style.css" />
   </head>
 
   <body>
@@ -46,50 +47,14 @@
       };
 
      // Affichage du Menu (grille de films)
-
      V.renderMenu = async function () {
        // Charger le template
        const templateFile = await fetch("./component/Menu/template.html");
        const template = await templateFile.text();
        let content = document.querySelector("#content");
        content.innerHTML = template;
-
-       // Affichage du menu directement ici
-       // Importer DataMovie
-       const module = await import("./data/dataMovie.js");
-       const DataMovie = module.DataMovie;
-
-       function createMovieCard(movie) {
-         const card = document.createElement("div");
-         card.className = "movie-card";
-
-         const img = document.createElement("img");
-         img.src = movie.image || "https://via.placeholder.com/200x300?text=No+Image";
-         img.alt = movie.title;
-
-         const title = document.createElement("div");
-         title.className = "movie-title";
-         title.textContent = movie.title;
-
-         const desc = document.createElement("div");
-         desc.className = "movie-desc";
-         desc.textContent = movie.description || "Pas de description.";
-
-         card.appendChild(img);
-         card.appendChild(title);
-         card.appendChild(desc);
-         return card;
-       }
-
-       const grid = document.getElementById("movieGrid");
-       if (grid) {
-         DataMovie.requestMovies().then(movies => {
-           grid.innerHTML = "";
-           movies.forEach(movie => {
-             grid.appendChild(createMovieCard(movie));
-           });
-         });
-       }
+       // Charger le JS du composant Menu
+       await import("./component/Menu/index.js");
      };
 
       C.start = function () {
