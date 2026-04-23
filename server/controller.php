@@ -25,3 +25,35 @@ function readMoviesController(){
     $movies = getAllMovies();
     return $movies;
 }
+
+function addMovieController() {
+    // Vérifie que tous les champs attendus sont présents
+    $required = ['name', 'director', 'year', 'length', 'description', 'id_category', 'image', 'trailer', 'min_age'];
+    foreach ($required as $field) {
+        if (!isset($_POST[$field])) {
+            return ["error" => "Champ manquant : $field"];
+        }
+    }
+    // Appelle la fonction du modèle
+    $result = addMovie(
+        $_POST['name'],
+        $_POST['director'],
+        $_POST['year'],
+        $_POST['length'],
+        $_POST['description'],
+        $_POST['id_category'],
+        $_POST['image'],
+        $_POST['trailer'],
+        $_POST['min_age']
+    );
+    if ($result === false) {
+        return ["error" => "Erreur lors de l'ajout du film."];
+    }
+    return ["success" => true];
+}
+
+function readMovieDetailController() {
+    if (!isset($_GET['id'])) return false;
+    $id = intval($_GET['id']);
+    return getMovieDetail($id);
+}

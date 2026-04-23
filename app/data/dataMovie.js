@@ -16,4 +16,10 @@ DataMovie.requestMovies = async function(){
     return data;
 }
 
+DataMovie.requestMovieDetails = async function(id){
+    const res = await fetch(`../server/script.php?todo=readMovieDetail&id=${id}`);
+    if (!res.ok) throw new Error('Erreur serveur');
+    return await res.json();
+}
+
 export {DataMovie};

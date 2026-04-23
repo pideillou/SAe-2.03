@@ -6,4 +6,4 @@
 
 @import "../component/NavBar/style.css" layer(components);
 
-@import "../component/Menu/style.css" layer(components);
+@import "../component/Movie/style.css" layer(components);

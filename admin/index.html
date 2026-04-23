@@ -1,31 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <title>SAE2.03 ADMIN</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./css/base.css" />
-  </head>
-  <body>
-    <section id="log"></section>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Ajouter un film</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./component/MovieForm/style.css" />
+</head>
+<body>
+  <h1>Ajouter un film</h1>
+  <section id="log"></section>
+  <section id="form"></section>
+  <script type="module">
+    import { setupMovieForm } from './component/MovieForm/script.js';
+    import { DataMovie } from './data/dataMovie.js';
 
-    <script type="module">
-      import { Log } from "./component/Log/script.js";
+    // Affiche le formulaire
+    fetch('./component/MovieForm/template.html')
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById('form').innerHTML = html;
+        setupMovieForm(addMovie);
+      });
 
-      window.C = {};
+    // Affiche un message dans la zone log
+    function showLog(msg, color = 'green') {
+      document.getElementById('log').innerHTML = `<div style="color:${color};padding:1rem;">${msg}</div>`;
+    }
 
-      C.start = function () {
-        V.renderLog("Démarrage de l'application");
-      };
-
-      window.V = {};
-
-      V.renderLog = function (txt) {
-        let content = document.querySelector("#log");
-        content.innerHTML = Log.format(txt);
-      };
-
-      C.start();
-    </script>
-  </body>
+    // Fonction appelée quand on soumet le formulaire
+    async function addMovie(data) {
+      showLog('Ajout du film en cours...', 'blue');
+      const result = await DataMovie.add(data);
+      if (result && result.success) {
+        showLog(result.success, 'green');
+        document.getElementById('movieForm').reset();
+      } else {
+        showLog(result.error || 'Erreur inconnue.', 'red');
+      }
+    }
+  </script>
+</body>
 </html>

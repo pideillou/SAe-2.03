@@ -23,7 +23,7 @@ function getAllMovies(){
     // Connexion à la base de données
     $cnx = new PDO("mysql:host=".HOST.";dbname=".DBNAME, DBLOGIN, DBPWD);
     // Requête SQL pour récupérer le menu avec des paramètres
-    $sql = "select id, name, image from Movie";
+    $sql = "select id, name, image, description from Movie";
     // Prépare la requête SQL
     $stmt = $cnx->prepare($sql);
     // Exécute la requête SQL
@@ -31,4 +31,25 @@ function getAllMovies(){
     // Récupère les résultats de la requête sous forme d'objets
     $res = $stmt->fetchAll(PDO::FETCH_OBJ);
     return $res; // Retourne les résultats
+}
+
+function addMovie($name, $director, $year, $length, $description, $id_category, $image, $trailer, $min_age) {
+    try {
+        $cnx = new PDO("mysql:host=".HOST.";dbname=".DBNAME, DBLOGIN, DBPWD);
+        $sql = "INSERT INTO Movie (name, director, year, length, description, id_category, image, trailer, min_age) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $cnx->prepare($sql);
+        $stmt->execute([$name, $director, $year, $length, $description, $id_category, $image, $trailer, $min_age]);
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function getMovieDetail($id) {
+    $cnx = new PDO("mysql:host=".HOST.";dbname=".DBNAME, DBLOGIN, DBPWD);
+    $sql = "SELECT m.id, m.name, m.image, m.description, m.director, m.year, m.length, m.trailer, m.min_age, c.name as category FROM Movie m LEFT JOIN Category c ON m.id_category = c.id WHERE m.id = ?";
+    $stmt = $cnx->prepare($sql);
+    $stmt->execute([$id]);
+    $res = $stmt->fetch(PDO::FETCH_OBJ);
+    return $res;
 }

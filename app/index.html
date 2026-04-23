@@ -4,8 +4,7 @@
     <title>SAE2.03 APP</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./css/base.css" />
-    <link rel="stylesheet" href="./component/Movie/style.css" />
+    <link rel="stylesheet" href="./css/global.css" />
   </head>
 
   <body>
@@ -25,6 +24,15 @@
         alert(
           "Ceci est une base de projet pour la SAE2.03 édition 2025. Bonne chance !"
         );
+      };
+
+      C.handlerDetail = async function(id) {
+        const { DataMovie } = await import("./data/dataMovie.js");
+        const { MovieDetail } = await import("./component/MovieDetail/script.js");
+        const movie = await DataMovie.requestMovieDetails(id);
+        let content = document.querySelector("#content");
+        content.innerHTML = "";
+        content.appendChild(MovieDetail.render(movie));
       };
 
       C.start = function () {
@@ -62,6 +70,12 @@
        DataMovie.requestMovies().then(films => {
          const grid = document.getElementById("movieGrid");
          grid.innerHTML = Movie.format(films);
+         // Ajout des listeners après injection du HTML
+         grid.querySelectorAll('.movie-card').forEach((card, i) => {
+           card.addEventListener('click', () => {
+             C.handlerDetail(films[i].id);
+           });
+         });
        });
      };
 
