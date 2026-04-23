@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./css/base.css" />
-    <link rel="stylesheet" href="./component/Menu/style.css" />
+    <link rel="stylesheet" href="./component/Movie/style.css" />
   </head>
 
   <body>
@@ -47,14 +47,22 @@
       };
 
      // Affichage du Menu (grille de films)
+
      V.renderMenu = async function () {
        // Charger le template
-       const templateFile = await fetch("./component/Menu/template.html");
+       const templateFile = await fetch("./component/Movie/template.html");
        const template = await templateFile.text();
        let content = document.querySelector("#content");
        content.innerHTML = template;
-       // Charger le JS du composant Menu
-       await import("./component/Menu/index.js");
+
+       // Charger le composant Movie
+       const { Movie } = await import("./component/Movie/index.js");
+       const { DataMovie } = await import("./data/dataMovie.js");
+       // Récupérer les films et afficher
+       DataMovie.requestMovies().then(films => {
+         const grid = document.getElementById("movieGrid");
+         grid.innerHTML = Movie.format(films);
+       });
      };
 
       C.start = function () {
