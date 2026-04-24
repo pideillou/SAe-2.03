@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
   <head>
     <title>SAE2.03 APP</title>
@@ -22,17 +22,23 @@
 
       C.handlerAbout = function () {
         alert(
-          "Ceci est une base de projet pour la SAE2.03 édition 2025. Bonne chance !"
+          "Ceci est une base de projet pour la SAE2.03 édition 2025. Bonne chance !",
         );
       };
 
-      C.handlerDetail = async function(id) {
-        const { DataMovie } = await import("./data/dataMovie.js");
-        const { MovieDetail } = await import("./component/MovieDetail/script.js");
-        const movie = await DataMovie.requestMovieDetails(id);
+      C.handlerDetail = async function (id) {
+        let DataMovie = (await import("./data/dataMovie.js")).DataMovie;
+        let MovieDetail = (await import("./component/MovieDetail/script.js"))
+          .MovieDetail;
         let content = document.querySelector("#content");
         content.innerHTML = "";
-        content.appendChild(MovieDetail.render(movie));
+        try {
+          let movie = await DataMovie.requestMovieDetails(id);
+          content.appendChild(MovieDetail.render(movie));
+        } catch (e) {
+          content.innerHTML =
+            '<div style="color:red">Erreur lors du chargement des détails du film.</div>';
+        }
       };
 
       C.start = function () {
@@ -54,30 +60,25 @@
         header.innerHTML = NavBar.format(hAbout);
       };
 
-     // Affichage du Menu (grille de films)
+      // Affichage du Menu (grille de films)
 
-     V.renderMenu = async function () {
-       // Charger le template
-       const templateFile = await fetch("./component/Movie/template.html");
-       const template = await templateFile.text();
-       let content = document.querySelector("#content");
-       content.innerHTML = template;
-
-       // Charger le composant Movie
-       const { Movie } = await import("./component/Movie/index.js");
-       const { DataMovie } = await import("./data/dataMovie.js");
-       // Récupérer les films et afficher
-       DataMovie.requestMovies().then(films => {
-         const grid = document.getElementById("movieGrid");
-         grid.innerHTML = Movie.format(films);
-         // Ajout des listeners après injection du HTML
-         grid.querySelectorAll('.movie-card').forEach((card, i) => {
-           card.addEventListener('click', () => {
-             C.handlerDetail(films[i].id);
-           });
-         });
-       });
-     };
+      V.renderMenu = async function () {
+        let DataMovie = (await import("./data/dataMovie.js")).DataMovie;
+        let MovieCategory = (
+          await import("./component/MovieCategory/script.js")
+        ).MovieCategory;
+        let content = document.querySelector("#content");
+        content.innerHTML = "";
+        try {
+          let grouped = await DataMovie.requestMoviesByCategory();
+          for (let cat in grouped) {
+            content.appendChild(MovieCategory.render(cat, grouped[cat]));
+          }
+        } catch (e) {
+          content.innerHTML =
+            '<div style="color:red">Erreur lors du chargement des films par catégorie.</div>';
+        }
+      };
 
       C.start = function () {
         V.renderNavBar("C.handlerAbout()");

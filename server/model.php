@@ -22,8 +22,8 @@ define("DBPWD", "pideill2");
 function getAllMovies(){
     // Connexion à la base de données
     $cnx = new PDO("mysql:host=".HOST.";dbname=".DBNAME, DBLOGIN, DBPWD);
-    // Requête SQL pour récupérer le menu avec des paramètres
-    $sql = "select id, name, image, description from Movie";
+    // Requête SQL pour récupérer les films avec leur catégorie
+    $sql = "SELECT m.id, m.name, m.image, m.description, m.director, m.year, m.length, m.trailer, m.min_age, COALESCE(c.name, 'Sans catégorie') AS category FROM Movie m LEFT JOIN Category c ON m.id_category = c.id ORDER BY category, m.name";
     // Prépare la requête SQL
     $stmt = $cnx->prepare($sql);
     // Exécute la requête SQL
