@@ -57,3 +57,48 @@ function readMovieDetailController() {
     $id = intval($_GET['id']);
     return getMovieDetail($id);
 }
+
+function addProfileController() {
+    // Vérifie que tous les champs attendus sont présents
+    $required = ['name', 'min_age'];
+    foreach ($required as $field) {
+        if (!isset($_POST[$field]) || $_POST[$field] === '') {
+            return ["error" => "Champ manquant : $field"];
+        }
+    }
+    
+    // Valide que le nom n'est pas vide
+    if (strlen(trim($_POST['name'])) === 0) {
+        return ["error" => "Le nom du profil ne peut pas être vide."];
+    }
+    
+    // Valide que min_age est un nombre entier valide
+    $min_age = intval($_POST['min_age']);
+    if ($min_age < 0 || $min_age > 18) {
+        return ["error" => "L'âge minimum doit être entre 0 et 18."];
+    }
+    
+    // Image est optionnelle
+    $image = isset($_POST['image']) ? $_POST['image'] : null;
+    
+    // Appelle la fonction du modèle
+    $result = addProfile(
+        trim($_POST['name']),
+        $image,
+        $min_age
+    );
+    
+    if ($result === false) {
+        return ["error" => "Erreur lors de l'ajout du profil."];
+    }
+    
+    return ["success" => "Le profil a été ajouté avec succès."];
+}
+
+function readProfilesController() {
+    $profiles = getAllProfiles();
+    if ($profiles === false) {
+        return ["error" => "Erreur lors de la récupération des profils."];
+    }
+    return $profiles;
+}

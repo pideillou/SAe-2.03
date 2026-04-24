@@ -1,51 +1,110 @@
-<form id="movieForm">
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="title">Titre du film *</label>
-        <input class="movie-form__input" type="text" id="title" name="title" required />
+<form id="movieForm" class="movie-form">
+  <div class="movie-form__hero">
+    <div class="movie-form__avatar" aria-hidden="true">F</div>
+    <div>
+      <p class="movie-form__kicker">Catalogue Flouflix</p>
+      <p class="movie-form__subtitle">Ajoute un film avec ses métadonnées</p>
     </div>
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="director">Réalisateur *</label>
-        <input class="movie-form__input" type="text" id="director" name="director" required />
-    </div>
-    <div class="movie-form__group"  >
-        <label class="movie-form__label" for="year">Année de sortie *</label>
-        <input class="movie-form__input" type="number" id="year" name="year" min="1888" max="2100" required />
-    </div>
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="duration">Durée (minutes) *</label>
-        <input class="movie-form__input" type="number" id="duration" name="duration" min="1" required />
-    </div>
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="description">Description / Synopsis *</label>
-        <textarea class="movie-form__input" id="description" name="description" required></textarea>
-    </div>
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="image">Nom du fichier de l'affiche *</label>
-        <input class="movie-form__input" type="text" id="image" name="image" required />
-    </div>
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="trailer">URL du trailer</label>
-        <input class="movie-form__input" type="url" id="trailer" name="trailer" />
-    </div>
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="category">Catégorie *</label>
-        <select class="movie-form__input" id="category" name="category" required>
-            <option value="">--Veuillez choisir une catégorie--</option>
-            <option value="1">Action</option>
-            <option value="2">Comédie</option>
-            <option value="3">Drame</option>
-            <option value="4">Science-fiction</option>
-            <option value="5">Animation</option>
-            <option value="6">Thriller</option>
-            <option value="7">Horreur</option>
-            <option value="8">Aventure</option>
-            <option value="9">Fantaisie</option>
-            <option value="10">Documentaire</option>
-        </select>
-    </div>
-    <div class="movie-form__group">
-        <label class="movie-form__label" for="age">Restriction d'âge *</label>
-        <input class="movie-form__input" type="number" id="age" name="age" min="0" max="18" required />
-    </div>
-    <button class="movie-form__button" type="submit">Ajouter le film</button>
+  </div>
+
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="title">Titre du film *</label>
+    <input
+      class="movie-form__input"
+      type="text"
+      id="title"
+      name="title"
+      required
+    />
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="director">Réalisateur *</label>
+    <input
+      class="movie-form__input"
+      type="text"
+      id="director"
+      name="director"
+      required
+    />
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="year">Année de sortie *</label>
+    <input
+      class="movie-form__input"
+      type="number"
+      id="year"
+      name="year"
+      min="1888"
+      max="2100"
+      required
+    />
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="duration">Durée (minutes) *</label>
+    <input
+      class="movie-form__input"
+      type="number"
+      id="duration"
+      name="duration"
+      min="1"
+      required
+    />
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="description"
+      >Description / Synopsis *</label
+    >
+    <textarea
+      class="movie-form__input"
+      id="description"
+      name="description"
+      required
+    ></textarea>
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="image"
+      >Nom du fichier de l'affiche *</label
+    >
+    <input
+      class="movie-form__input"
+      type="text"
+      id="image"
+      name="image"
+      required
+    />
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="trailer">URL du trailer</label>
+    <input class="movie-form__input" type="url" id="trailer" name="trailer" />
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="category">Catégorie *</label>
+    <select class="movie-form__input" id="category" name="category" required>
+      <option value="">--Veuillez choisir une catégorie--</option>
+      <option value="1">Action</option>
+      <option value="2">Comédie</option>
+      <option value="3">Drame</option>
+      <option value="4">Science-fiction</option>
+      <option value="5">Animation</option>
+      <option value="6">Thriller</option>
+      <option value="7">Horreur</option>
+      <option value="8">Aventure</option>
+      <option value="9">Fantaisie</option>
+      <option value="10">Documentaire</option>
+    </select>
+  </div>
+  <div class="movie-form__group">
+    <label class="movie-form__label" for="age">Restriction d'âge *</label>
+    <input
+      class="movie-form__input"
+      type="number"
+      id="age"
+      name="age"
+      min="0"
+      max="18"
+      required
+    />
+  </div>
+
+  <button class="movie-form__button" type="submit">Ajouter le film</button>
 </form>

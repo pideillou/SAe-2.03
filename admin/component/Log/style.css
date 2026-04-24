@@ -1,7 +1,8 @@
 .log {
   display: flex;
   align-items: flex-end;
-  width: 30rem;
+  width: 100%;
+  max-width: 30rem;
   height: 8rem;
   padding: 1rem 1rem 1rem 1.5rem;
 
@@ -9,19 +10,22 @@
   border-style: solid;
   border-color: var(--color-fg);
   border-width: 1px;
+  border-radius: 0.65rem;
   overflow: hidden;
-  .log__list {
-    font-size: smaller;
-    color: var(--color-accent);
-    overflow-y: scroll;
-    .last {
-      animation: fondu-en-entree 1s ease-in-out;
-    }
+}
 
-    .clignotant {
-      animation: clignotement 2.5s infinite;
-    }
-  }
+.log .log__list {
+  font-size: smaller;
+  color: var(--color-accent);
+  overflow-y: auto;
+}
+
+.log .log__list .last {
+  animation: fondu-en-entree 1s ease-in-out;
+}
+
+.log .log__list .clignotant {
+  animation: clignotement 2.5s infinite;
 }
 
 @keyframes fondu-en-entree {

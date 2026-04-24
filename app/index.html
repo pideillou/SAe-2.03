@@ -1,10 +1,11 @@
 <!doctype html>
 <html lang="fr">
   <head>
-    <title>SAE2.03 APP</title>
+    <title>Flouflix</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./css/global.css" />
+    <link rel="icon" type="image/png" href="../server/images/logo.png" />
   </head>
 
   <body>
@@ -15,15 +16,17 @@
     <script type="module">
       import { NavBar } from "./component/NavBar/script.js";
 
-      // Controleur
-      // Rappel, écrire window.C plutôt que let C est nécessaire pour tester depuis la console du navigateur
-      // Une fois l'application terminée, on pourrait remettre let C.
       window.C = {};
 
       C.handlerAbout = function () {
         alert(
           "Ceci est une base de projet pour la SAE2.03 édition 2025. Bonne chance !",
         );
+      };
+
+      C.handlerHome = function () {
+        V.renderMenu();
+        return false;
       };
 
       C.handlerDetail = async function (id) {
@@ -37,7 +40,7 @@
           content.appendChild(MovieDetail.render(movie));
         } catch (e) {
           content.innerHTML =
-            '<div style="color:red">Erreur lors du chargement des détails du film.</div>';
+            '<div style="color:#999999">Erreur lors du chargement des détails du film.</div>';
         }
       };
 
@@ -45,22 +48,19 @@
         V.renderNavBar("C.handlerAbout()");
       };
 
-      // Vue (contient tout ce qui est relatif à l'affichage)
       window.V = {};
 
-      /**
-       * V.renderNavBar
-       *
-       * Cette fonction est responsable de l'affichage de la barre de navigation (NavBar).
-       * Elle sélectionne l'élément HTML avec l'ID "header" et y insère le contenu
-       * formaté par le composant NavBar.
-       */
       V.renderNavBar = function (hAbout) {
         let header = document.querySelector("#header");
-        header.innerHTML = NavBar.format(hAbout);
+        header.innerHTML = NavBar.format(hAbout, "C.handlerHome()");
+        let brand = header.querySelector(".navbar__brand");
+        if (brand) {
+          brand.addEventListener("click", function (event) {
+            event.preventDefault();
+            C.handlerHome();
+          });
+        }
       };
-
-      // Affichage du Menu (grille de films)
 
       V.renderMenu = async function () {
         let DataMovie = (await import("./data/dataMovie.js")).DataMovie;
@@ -68,7 +68,15 @@
           await import("./component/MovieCategory/script.js")
         ).MovieCategory;
         let content = document.querySelector("#content");
-        content.innerHTML = "";
+        content.innerHTML = `
+          <section class="catalog-hero" aria-label="Flouflix sélection du moment">
+            <p class="catalog-hero__kicker">Plateforme de streaming</p>
+            <h1 class="catalog-hero__title">FLOUFLIX</h1>
+            <p class="catalog-hero__text">
+              Explore des catalogues par univers, découvre des fiches détaillées et lance ta prochaine soirée cinéma.
+            </p>
+          </section>
+        `;
         try {
           let grouped = await DataMovie.requestMoviesByCategory();
           for (let cat in grouped) {
@@ -76,7 +84,7 @@
           }
         } catch (e) {
           content.innerHTML =
-            '<div style="color:red">Erreur lors du chargement des films par catégorie.</div>';
+            '<div style="color:#999999">Erreur lors du chargement des films par catégorie.</div>';
         }
       };
 
@@ -85,7 +93,7 @@
         V.renderMenu();
       };
 
-      C.start(); // Démarre l'application
+      C.start();
     </script>
   </body>
 </html>

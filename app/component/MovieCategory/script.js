@@ -5,7 +5,7 @@ export let MovieCategory = {
     let el = document.createElement("div");
     el.className = "movie-category";
     el.innerHTML = `
-      <h2 class="movie-category__title">${categoryName}</h2>
+      <h2 class="movie-category__title">${categoryName} <span class="movie-badge">${films.length} titres</span></h2>
       <div class="movie-category__list">${Movie.format(films)}</div>
     `;
     return el;

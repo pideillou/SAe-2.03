@@ -1,4 +1,10 @@
 <?php
+// Activer le rapport d'erreurs PHP
+error_reporting(E_ALL);
+
+// Forcer l'affichage des erreurs à l'écran
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 /** ARCHITECTURE PHP SERVEUR : Rôle du fichier script.php
  * 
  * Ce fichier est celui à qui on adresse toutes les requêtes HTTP.
@@ -66,6 +72,14 @@ if ( isset($_REQUEST['todo']) ){
       $data = readMovieDetailController();
       break;
 
+    case 'addProfile':
+      $data = addProfileController();
+      break;
+
+    case 'readProfiles':
+      $data = readProfilesController();
+      break;
+
 
     default: // il y a un paramètre todo mais sa valeur n'est pas reconnue/supportée
       echo json_encode('[error] Unknown todo value');
@@ -93,8 +107,8 @@ if ( isset($_REQUEST['todo']) ){
    * par la fonction de contrôleur et encodées en JSON (json_encode).
    * On renvoie aussi un code de réponse HTTP 200 (OK) pour indiquer que la requête a été traitée avec succès.
    */
-  echo json_encode($data);
   http_response_code(200); // 200 == "OK"
+  echo json_encode($data);
   exit();
 
    

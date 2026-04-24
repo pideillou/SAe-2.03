@@ -1,0 +1,57 @@
+<form id="profileForm" class="profile-form">
+  <div class="profile-form__hero">
+    <div class="profile-form__avatar" aria-hidden="true">F</div>
+    <div>
+      <p class="profile-form__kicker">Gestion des accès</p>
+      <p class="profile-form__subtitle">Crée un profil avec son âge minimum</p>
+    </div>
+  </div>
+
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileName">Nom du profil *</label>
+    <input
+      class="profile-form__input"
+      type="text"
+      id="profileName"
+      name="name"
+      required
+      placeholder="Ex: Enfants, Adultes, Adolescents..."
+    />
+  </div>
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileImage"
+      >Image / Avatar (optionnel)</label
+    >
+    <input
+      class="profile-form__input"
+      type="text"
+      id="profileImage"
+      name="image"
+      placeholder="Ex: avatar_kids.jpg"
+    />
+  </div>
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileMinAge"
+      >Restriction d'âge minimum *</label
+    >
+    <select
+      class="profile-form__input"
+      id="profileMinAge"
+      name="min_age"
+      required
+    >
+      <option value="">--Sélectionnez une restriction d'âge--</option>
+      <option value="0">0 - Tous publics</option>
+      <option value="3">3 ans+</option>
+      <option value="6">6 ans+</option>
+      <option value="8">8 ans+</option>
+      <option value="10">10 ans+</option>
+      <option value="12">12 ans+</option>
+      <option value="14">14 ans+</option>
+      <option value="16">16 ans+</option>
+      <option value="18">18 ans+ (Adultes)</option>
+    </select>
+  </div>
+
+  <button class="profile-form__button" type="submit">Ajouter le profil</button>
+</form>

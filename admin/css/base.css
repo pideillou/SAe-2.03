@@ -1,7 +1,238 @@
-@layer reset, variables, components, utilities;
+@import "./reset.css";
+@import "./variables.css";
+@import "./utilities.css";
 
-@import "./reset.css" layer(reset);
-@import "./variables.css" layer(variables);
-@import "./utilities.css" layer(utilities);
+@import "../component/Log/style.css";
+@import "../component/MovieForm/style.css";
+@import "../component/ProfileForm/style.css";
 
-@import "../component/Log/style.css" layer(components);
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--color-fg);
+  font-family: var(--ff-sans);
+  background: var(--color-bg);
+}
+
+body > h1 {
+  width: min(94vw, 76rem);
+  margin: 1.4rem auto 0.8rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-gray-dark);
+}
+
+.admin-container {
+  width: min(94vw, 76rem);
+  margin: 0 auto 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.3rem;
+}
+
+.admin-section {
+  padding: 1.1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.admin-section h2 {
+  margin-bottom: 0.6rem;
+  font-size: 1.2rem;
+}
+
+.admin-log {
+  margin-bottom: 0.9rem;
+  border-radius: 0.65rem;
+  border: 1px solid var(--color-border);
+  min-height: 3rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(5, 7, 13, 0.55);
+}
+
+.admin-log--info {
+  color: #888888;
+}
+
+.admin-log--success {
+  color: #777777;
+}
+
+.admin-log--error {
+  color: #999999;
+}
+
+/* Force une DA identique pour les deux formulaires, meme en cas de cache stale des CSS composants */
+#movieForm,
+#profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 100%;
+  margin: 0;
+  background: var(--color-surface);
+  padding: 1.1rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+#movieForm .movie-form__hero,
+#profileForm .profile-form__hero {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+#movieForm .movie-form__avatar,
+#profileForm .profile-form__avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  color: var(--color-white);
+  background: var(--color-accent);
+}
+
+#movieForm .movie-form__kicker,
+#profileForm .profile-form__kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+#movieForm .movie-form__subtitle,
+#profileForm .profile-form__subtitle {
+  margin: 0.12rem 0 0;
+  font-size: 0.88rem;
+  color: var(--color-gray-light);
+}
+
+#movieForm .movie-form__group,
+#profileForm .profile-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+#movieForm .movie-form__label,
+#profileForm .profile-form__label {
+  color: var(--color-fg);
+  margin-bottom: 0;
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+#movieForm .movie-form__input,
+#profileForm .profile-form__input {
+  padding: 0.65rem 0.76rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  width: 100%;
+  margin-bottom: 0;
+  font-size: 0.95rem;
+  background: var(--color-white);
+  color: var(--color-fg);
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s,
+    box-shadow 0.2s;
+}
+
+#movieForm textarea.movie-form__input,
+#profileForm textarea.profile-form__input {
+  min-height: 6.5rem;
+  resize: vertical;
+}
+
+#movieForm select.movie-form__input,
+#profileForm select.profile-form__input {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-gray) 50%),
+    linear-gradient(135deg, var(--color-gray) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.1rem) calc(50% - 0.16rem),
+    calc(100% - 0.78rem) calc(50% - 0.16rem);
+  background-size:
+    0.34rem 0.34rem,
+    0.34rem 0.34rem;
+  background-repeat: no-repeat;
+  padding-right: 2rem;
+}
+
+#movieForm .movie-form__input option,
+#profileForm .profile-form__input option {
+  background: var(--color-white);
+  color: var(--color-fg);
+}
+
+#movieForm .movie-form__input:focus,
+#profileForm .profile-form__input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background: #f9f9f9;
+  box-shadow: 0 0 0 3px rgba(102, 102, 102, 0.1);
+}
+
+#movieForm .movie-form__input::placeholder,
+#profileForm .profile-form__input::placeholder {
+  color: var(--color-gray-light);
+}
+
+#movieForm .movie-form__chips,
+#profileForm .profile-form__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+#movieForm .movie-form__chip,
+#profileForm .profile-form__chip {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  color: var(--color-gray-dark);
+  font-size: 0.72rem;
+}
+
+#movieForm .movie-form__button,
+#profileForm .profile-form__button {
+  background: var(--color-accent);
+  color: var(--color-white);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+  cursor: pointer;
+  font-size: 0.92rem;
+  margin-top: 0.4rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition:
+    transform 0.2s,
+    filter 0.2s;
+}
+
+#movieForm .movie-form__button:hover,
+#profileForm .profile-form__button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+@media (max-width: 720px) {
+  .admin-container {
+    grid-template-columns: 1fr;
+  }
+}

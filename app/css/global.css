@@ -1,9 +1,20 @@
-@layer reset, variables, components, utilities;
+@import "./reset.css";
+@import "./variables.css";
+@import "./utilities.css";
 
-@import "./reset.css" layer(reset);
-@import "./variables.css" layer(variables);
-@import "./utilities.css" layer(utilities);
+@import "../component/NavBar/style.css";
+@import "../component/Movie/style.css";
+@import "../component/MovieDetail/style.css";
 
-@import "../component/NavBar/style.css" layer(components);
+body {
+  min-height: 100vh;
+  color: var(--color-fg);
+  font-family: var(--ff-sans);
+  background: var(--color-bg);
+}
 
-@import "../component/Movie/style.css" layer(components);
+#content {
+  width: min(94vw, 82rem);
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}

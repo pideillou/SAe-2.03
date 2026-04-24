@@ -1,44 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin - Ajouter un film</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./css/base.css" />
-  <link rel="stylesheet" href="./component/MovieForm/style.css" />
-</head>
-<body>
-  <h1>Ajouter un film</h1>
-  <section id="log"></section>
-  <section id="form"></section>
-  <script type="module">
-    import { setupMovieForm } from './component/MovieForm/script.js';
-    import { DataMovie } from './data/dataMovie.js';
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin - Gestion des contenus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="icon" type="image/png" href="../server/images/logo.png" />
+  </head>
+  <body>
+    <h1>Admin - Gestion des contenus</h1>
 
-    // Affiche le formulaire
-    fetch('./component/MovieForm/template.html')
-      .then(r => r.text())
-      .then(html => {
-        document.getElementById('form').innerHTML = html;
-        setupMovieForm(addMovie);
-      });
+    <div class="admin-container">
+      <div class="admin-section">
+        <h2>Ajouter un film</h2>
+        <section id="logMovie"></section>
+        <section id="formMovie"></section>
+      </div>
 
-    // Affiche un message dans la zone log
-    function showLog(msg, color = 'green') {
-      document.getElementById('log').innerHTML = `<div style="color:${color};padding:1rem;">${msg}</div>`;
-    }
+      <div class="admin-section">
+        <h2>Ajouter un profil utilisateur</h2>
+        <section id="logProfile"></section>
+        <section id="formProfile"></section>
+      </div>
+    </div>
 
-    // Fonction appelée quand on soumet le formulaire
-    async function addMovie(data) {
-      showLog('Ajout du film en cours...', 'blue');
-      const result = await DataMovie.add(data);
-      if (result && result.success) {
-        showLog(result.success, 'green');
-        document.getElementById('movieForm').reset();
-      } else {
-        showLog(result.error || 'Erreur inconnue.', 'red');
+    <script type="module">
+      import { setupMovieForm } from "./component/MovieForm/script.js";
+      import { setupProfileForm } from "./component/ProfileForm/script.js";
+      import { DataMovie } from "./data/dataMovie.js";
+      import { DataProfile } from "./data/dataProfile.js";
+
+      // ============ Gestion du formulaire Film ============
+      // Affiche le formulaire de film
+      fetch("./component/MovieForm/template.html", { cache: "no-store" })
+        .then((r) => r.text())
+        .then((html) => {
+          document.getElementById("formMovie").innerHTML = html;
+          setupMovieForm(addMovie);
+        });
+
+      function showLogMovie(msg, color = "green") {
+        const logClass =
+          color === "red"
+            ? "admin-log admin-log--error"
+            : color === "blue"
+              ? "admin-log admin-log--info"
+              : "admin-log admin-log--success";
+        document.getElementById("logMovie").innerHTML =
+          `<div class="${logClass}">${msg}</div>`;
       }
-    }
-  </script>
-</body>
+
+      // Fonction appelée quand on soumet le formulaire de film
+      async function addMovie(data) {
+        showLogMovie("Ajout du film en cours...", "blue");
+        const result = await DataMovie.add(data);
+        if (result && result.success) {
+          showLogMovie(result.success, "green");
+          document.getElementById("movieForm").reset();
+        } else {
+          showLogMovie(result.error || "Erreur inconnue.", "red");
+        }
+      }
+
+      // ============ Gestion du formulaire Profil ============
+      // Affiche le formulaire de profil
+      fetch("./component/ProfileForm/template.html", { cache: "no-store" })
+        .then((r) => r.text())
+        .then((html) => {
+          document.getElementById("formProfile").innerHTML = html;
+          setupProfileForm(addProfile);
+        });
+
+      // Affiche un message dans la zone log profil
+      function showLogProfile(msg, color = "green") {
+        const logClass =
+          color === "red"
+            ? "admin-log admin-log--error"
+            : color === "blue"
+              ? "admin-log admin-log--info"
+              : "admin-log admin-log--success";
+        document.getElementById("logProfile").innerHTML =
+          `<div class="${logClass}">${msg}</div>`;
+      }
+
+      // Fonction appelée quand on soumet le formulaire de profil
+      async function addProfile(data) {
+        showLogProfile("Ajout du profil en cours...", "blue");
+        const result = await DataProfile.add(data);
+        if (result && result.success) {
+          showLogProfile(result.success, "green");
+          document.getElementById("profileForm").reset();
+        } else {
+          showLogProfile(result.error || "Erreur inconnue.", "red");
+        }
+      }
+    </script>
+  </body>
 </html>

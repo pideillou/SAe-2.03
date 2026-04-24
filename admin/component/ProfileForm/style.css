@@ -1,4 +1,4 @@
-.movie-form {
+.profile-form {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
@@ -11,7 +11,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.movie-form__hero {
+.profile-form__hero {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -19,7 +19,7 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.movie-form__avatar {
+.profile-form__avatar {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 999px;
@@ -30,7 +30,7 @@
   background: var(--color-accent);
 }
 
-.movie-form__kicker {
+.profile-form__kicker {
   margin: 0;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
@@ -38,19 +38,19 @@
   color: var(--color-accent);
 }
 
-.movie-form__subtitle {
+.profile-form__subtitle {
   margin: 0.12rem 0 0;
   font-size: 0.88rem;
   color: var(--color-gray);
 }
 
-.movie-form__group {
+.profile-form__group {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
 
-.movie-form__label {
+.profile-form__label {
   color: var(--color-fg);
   margin-bottom: 0;
   font-size: 0.84rem;
@@ -59,7 +59,7 @@
   font-weight: 700;
 }
 
-.movie-form__input {
+.profile-form__input {
   padding: 0.65rem 0.76rem;
   border-radius: 0.5rem;
   border: 1px solid var(--color-border);
@@ -75,7 +75,7 @@
     box-shadow 0.2s;
 }
 
-select.movie-form__input {
+select.profile-form__input {
   appearance: none;
   background-image:
     linear-gradient(45deg, transparent 50%, var(--color-gray) 50%),
@@ -90,44 +90,39 @@ select.movie-form__input {
   padding-right: 2rem;
 }
 
-.movie-form__input option {
+.profile-form__input option {
   background: var(--color-white);
   color: var(--color-fg);
 }
 
-.movie-form__input:focus {
+.profile-form__input:focus {
   outline: none;
   border-color: var(--color-accent);
   background: #f9f9f9;
   box-shadow: 0 0 0 3px rgba(102, 102, 102, 0.1);
 }
 
-.movie-form__input::placeholder {
+.profile-form__input::placeholder {
   color: var(--color-gray-light);
 }
 
-.movie-form textarea.movie-form__input {
-  min-height: 6.5rem;
-  resize: vertical;
-}
-
-.movie-form__chips {
+.profile-form__chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
 }
 
-.movie-form__chip {
+.profile-form__chip {
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: #e7ebf4;
+  border: 1px solid var(--color-border);
+  color: var(--color-gray-dark);
   font-size: 0.72rem;
 }
 
-.movie-form__button {
-  background: linear-gradient(90deg, #98070f, var(--color-red));
-  color: #fff;
+.profile-form__button {
+  background: var(--color-accent);
+  color: var(--color-white);
   border: none;
   border-radius: 0.5rem;
   padding: 0.8rem;
@@ -142,7 +137,7 @@ select.movie-form__input {
     filter 0.2s;
 }
 
-.movie-form__button:hover {
+.profile-form__button:hover {
   transform: translateY(-1px);
   filter: brightness(1.08);
 }
