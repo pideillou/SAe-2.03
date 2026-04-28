@@ -15,13 +15,24 @@
 
     <script type="module">
       import { NavBar } from "./component/NavBar/script.js";
+      import { DataMovie } from "./data/dataMovie.js";
+      import { DataProfile } from "./data/dataProfile.js";
+      import { MovieCategory } from "./component/MovieCategory/script.js";
+      import { MovieDetail } from "./component/MovieDetail/script.js";
 
       window.C = {};
+      window.V = {};
+      C.activeProfileId = null;
+      C.profiles = [];
 
       C.handlerAbout = function () {
-        alert(
-          "Ceci est une base de projet pour la SAE2.03 édition 2025. Bonne chance !",
-        );
+        alert("Ceci est une base de projet pour la SAE2.03. Bonne chance !");
+      };
+
+      C.handlerSelectProfile = function (profileId) {
+        C.activeProfileId = profileId;
+        V.renderNavBar();
+        V.renderMenu();
       };
 
       C.handlerHome = function () {
@@ -30,29 +41,27 @@
       };
 
       C.handlerDetail = async function (id) {
-        let DataMovie = (await import("./data/dataMovie.js")).DataMovie;
-        let MovieDetail = (await import("./component/MovieDetail/script.js"))
-          .MovieDetail;
-        let content = document.querySelector("#content");
-        content.innerHTML = "";
-        try {
-          let movie = await DataMovie.requestMovieDetails(id);
-          content.appendChild(MovieDetail.render(movie));
-        } catch (e) {
-          content.innerHTML =
-            '<div style="color:#999999">Erreur lors du chargement des détails du film.</div>';
+        let movie = await DataMovie.requestMovieDetails(id);
+        if (!movie || movie.error) {
+          V.renderError("Erreur lors du chargement des details du film.");
+          return;
         }
+        V.renderMovieDetail(movie);
       };
 
       C.start = function () {
-        V.renderNavBar("C.handlerAbout()");
+        V.renderApp();
       };
 
-      window.V = {};
-
-      V.renderNavBar = function (hAbout) {
+      V.renderNavBar = function () {
         let header = document.querySelector("#header");
-        header.innerHTML = NavBar.format(hAbout, "C.handlerHome()");
+        header.innerHTML = NavBar.format(
+          "C.handlerAbout()",
+          "C.handlerHome()",
+          C.profiles,
+          C.activeProfileId,
+        );
+
         let brand = header.querySelector(".navbar__brand");
         if (brand) {
           brand.addEventListener("click", function (event) {
@@ -62,39 +71,55 @@
         }
       };
 
+      V.renderApp = async function () {
+        let profiles = await DataProfile.read();
+        if (Array.isArray(profiles)) {
+          C.profiles = profiles;
+          if (!C.activeProfileId && profiles.length > 0) {
+            C.activeProfileId = profiles[0].id;
+          }
+        }
+
+        V.renderNavBar();
+        V.renderMenu();
+      };
+
       V.renderMenu = async function () {
-        let DataMovie = (await import("./data/dataMovie.js")).DataMovie;
-        let MovieCategory = (
-          await import("./component/MovieCategory/script.js")
-        ).MovieCategory;
         let content = document.querySelector("#content");
         content.innerHTML = `
-          <section class="catalog-hero" aria-label="Flouflix sélection du moment">
+          <section class="catalog-hero" aria-label="Flouflix selection du moment">
             <p class="catalog-hero__kicker">Plateforme de streaming</p>
             <h1 class="catalog-hero__title">FLOUFLIX</h1>
             <p class="catalog-hero__text">
-              Explore des catalogues par univers, découvre des fiches détaillées et lance ta prochaine soirée cinéma.
+              Explore des catalogues par univers, decouvre des fiches detaillees et lance ta prochaine soiree cinema.
             </p>
           </section>
         `;
-        try {
-          let grouped = await DataMovie.requestMoviesByCategory();
-          for (let cat in grouped) {
-            content.appendChild(MovieCategory.render(cat, grouped[cat]));
-          }
-        } catch (e) {
-          content.innerHTML =
-            '<div style="color:#999999">Erreur lors du chargement des films par catégorie.</div>';
+
+        let grouped = await DataMovie.requestMoviesByCategory();
+        if (!grouped || grouped.error) {
+          V.renderError("Erreur lors du chargement des films.");
+          return;
         }
+
+        let html = "";
+        for (let category in grouped) {
+          html += MovieCategory.format(category, grouped[category]);
+        }
+        content.innerHTML += html;
       };
 
-      C.start = function () {
-        V.renderNavBar("C.handlerAbout()");
-        V.renderMenu();
+      V.renderMovieDetail = function (movie) {
+        let content = document.querySelector("#content");
+        content.innerHTML = MovieDetail.format(movie);
+      };
+
+      V.renderError = function (txt) {
+        let content = document.querySelector("#content");
+        content.innerHTML = '<div style="color:#999999">' + txt + "</div>";
       };
 
       C.start();
     </script>
   </body>
 </html>
-<script type="module"></script>

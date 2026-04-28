@@ -1,25 +1,12 @@
-export function setupProfileForm(handler) {
-  const form = document.getElementById("profileForm");
-  if (!form) return;
+let templateFile = await fetch("./component/ProfileForm/template.html");
+let template = await templateFile.text();
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
+let ProfileForm = {};
 
-    const data = {};
-    data.name = form.name.value;
-    data.image = form.image.value || null;
-    data.min_age = form.min_age.value;
+ProfileForm.format = function (handler) {
+  let html = template;
+  html = html.replace("{{handler}}", handler);
+  return html;
+};
 
-    if (!data.name || !data.min_age) {
-      alert("Remplis tous les champs obligatoires.");
-      return;
-    }
-
-    if (data.name.trim().length === 0) {
-      alert("Le nom du profil ne peut pas être vide.");
-      return;
-    }
-
-    handler(data);
-  });
-}
+export { ProfileForm };

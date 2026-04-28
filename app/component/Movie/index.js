@@ -1,26 +1,49 @@
-export const Movie = {
-  format: function (films) {
-    if (!films || films.length === 0) {
-      return `<div class="no-movie-msg">Oups, aucun film n\'est disponible !</div>`;
-    }
-    return `<div class="movie-grid">
-      ${films
-        .map(
-          (film) => `
-        <div class="movie-card" onclick=\"C.handlerDetail(${film.id})\">
-          <img src="${film.image ? "../server/images/" + film.image : "https://via.placeholder.com/200x300?text=No+Image"}" alt="${film.name || "Film"}">
-          <div class="movie-info">
-            <div class="movie-title">${film.name || "Titre inconnu"}</div>
-            <div class="movie-desc">${film.description || "Pas de description."}</div>
-            <div class="movie-meta">
-              <span class="movie-badge">${film.year || "N/A"}</span>
-              <span class="movie-play" aria-hidden="true">▶</span>
-            </div>
-          </div>
-        </div>
-      `,
-        )
-        .join("")}
-    </div>`;
-  },
+let templateFile = await fetch("./component/Movie/template.html");
+let template = await templateFile.text();
+
+let Movie = {};
+
+function getMovieLabel(movie) {
+  return (
+    movie.name ||
+    movie.title ||
+    movie.titre ||
+    movie.nom ||
+    movie.movie_name ||
+    movie.movieName ||
+    "Titre inconnu"
+  );
+}
+
+Movie.format = function (movie) {
+  let html = template;
+  html = html.replace("{{handler}}", "C.handlerDetail(" + movie.id + ")");
+  html = html.replace(
+    "{{image}}",
+    movie.image
+      ? "../server/images/" + movie.image
+      : "https://via.placeholder.com/200x300?text=No+Image",
+  );
+  html = html.split("{{name}}").join(getMovieLabel(movie));
+  html = html.replace(
+    "{{description}}",
+    movie.description || "Pas de description.",
+  );
+  html = html.replace("{{year}}", movie.year || "N/A");
+  return html;
 };
+
+Movie.formatMany = function (movies) {
+  if (!movies || movies.length === 0) {
+    return '<div class="no-movie-msg">Oups, aucun film n\'est disponible !</div>';
+  }
+
+  let html = '<div class="movie-grid">';
+  for (const movie of movies) {
+    html += Movie.format(movie);
+  }
+  html += "</div>";
+  return html;
+};
+
+export { Movie };

@@ -1,104 +1,97 @@
 <?php
 
-/** ARCHITECTURE PHP SERVEUR  : Rôle du fichier controller.php
- * 
- *  Dans ce fichier, on va définir les fonctions de contrôle qui vont traiter les requêtes HTTP.
- *  Les requêtes HTTP sont interprétées selon la valeur du paramètre 'todo' de la requête (voir script.php)
- *  Pour chaque valeur différente, on déclarera une fonction de contrôle différente.
- * 
- *  Les fonctions de contrôle vont éventuellement lire les paramètres additionnels de la requête, 
- *  les vérifier, puis appeler les fonctions du modèle (model.php) pour effectuer les opérations
- *  nécessaires sur la base de données.
- *  
- *  Si la fonction échoue à traiter la requête, elle retourne false (mauvais paramètres, erreur de connexion à la BDD, etc.)
- *  Sinon elle retourne le résultat de l'opération (des données ou un message) à includre dans la réponse HTTP.
- */
+require('model.php');
 
-/** Inclusion du fichier model.php
- *  Pour pouvoir utiliser les fonctions qui y sont déclarées et qui permettent
- *  de faire des opérations sur les données stockées en base de données.
- */
-require("model.php");
-
-
-function readMoviesController(){
-    $movies = getAllMovies();
-    return $movies;
+function readMoviesController()
+{
+    return getAllMovies();
 }
 
-function addMovieController() {
-    // Vérifie que tous les champs attendus sont présents
-    $required = ['name', 'director', 'year', 'length', 'description', 'id_category', 'image', 'trailer', 'min_age'];
+function addMovieController()
+{
+    $required = ['name', 'director', 'year', 'length', 'description', 'id_category', 'image', 'min_age'];
     foreach ($required as $field) {
-        if (!isset($_POST[$field])) {
-            return ["error" => "Champ manquant : $field"];
+        if (!isset($_POST[$field]) || trim((string) $_POST[$field]) === '') {
+            return false;
         }
     }
-    // Appelle la fonction du modèle
-    $result = addMovie(
-        $_POST['name'],
-        $_POST['director'],
-        $_POST['year'],
-        $_POST['length'],
-        $_POST['description'],
-        $_POST['id_category'],
-        $_POST['image'],
-        $_POST['trailer'],
-        $_POST['min_age']
-    );
-    if ($result === false) {
-        return ["error" => "Erreur lors de l'ajout du film."];
+
+    $name = trim($_POST['name']);
+    $director = trim($_POST['director']);
+    $year = (int) $_POST['year'];
+    $length = (int) $_POST['length'];
+    $description = trim($_POST['description']);
+    $idCategory = (int) $_POST['id_category'];
+    $image = trim($_POST['image']);
+    $trailer = isset($_POST['trailer']) ? trim((string) $_POST['trailer']) : '';
+    $minAge = (int) $_POST['min_age'];
+
+    if ($year < 1888 || $year > 2100) {
+        return false;
     }
-    return ["success" => true];
+    if ($length < 1) {
+        return false;
+    }
+    if ($idCategory < 1) {
+        return false;
+    }
+    if ($minAge < 0 || $minAge > 18) {
+        return false;
+    }
+
+    $ok = addMovie($name, $director, $year, $length, $description, $idCategory, $image, $trailer, $minAge);
+    if ($ok === false) {
+        return false;
+    }
+
+    return ['success' => 'Le film a ete ajoute avec succes.'];
 }
 
-function readMovieDetailController() {
-    if (!isset($_GET['id'])) return false;
-    $id = intval($_GET['id']);
-    return getMovieDetail($id);
+function readMovieDetailController()
+{
+    if (!isset($_REQUEST['id']) || empty($_REQUEST['id'])) {
+        return false;
+    }
+
+    $id = (int) $_REQUEST['id'];
+    if ($id < 1) {
+        return false;
+    }
+
+    $movie = getMovieDetail($id);
+    if ($movie === false || $movie === null) {
+        return false;
+    }
+
+    return $movie;
 }
 
-function addProfileController() {
-    // Vérifie que tous les champs attendus sont présents
-    $required = ['name', 'min_age'];
-    foreach ($required as $field) {
-        if (!isset($_POST[$field]) || $_POST[$field] === '') {
-            return ["error" => "Champ manquant : $field"];
-        }
+function addProfileController()
+{
+    if (!isset($_POST['name']) || trim((string) $_POST['name']) === '') {
+        return false;
     }
-    
-    // Valide que le nom n'est pas vide
-    if (strlen(trim($_POST['name'])) === 0) {
-        return ["error" => "Le nom du profil ne peut pas être vide."];
+    if (!isset($_POST['min_age']) || $_POST['min_age'] === '') {
+        return false;
     }
-    
-    // Valide que min_age est un nombre entier valide
-    $min_age = intval($_POST['min_age']);
-    if ($min_age < 0 || $min_age > 18) {
-        return ["error" => "L'âge minimum doit être entre 0 et 18."];
+
+    $name = trim($_POST['name']);
+    $minAge = (int) $_POST['min_age'];
+    $image = isset($_POST['image']) && trim((string) $_POST['image']) !== '' ? trim($_POST['image']) : null;
+
+    if ($minAge < 0 || $minAge > 18) {
+        return false;
     }
-    
-    // Image est optionnelle
-    $image = isset($_POST['image']) ? $_POST['image'] : null;
-    
-    // Appelle la fonction du modèle
-    $result = addProfile(
-        trim($_POST['name']),
-        $image,
-        $min_age
-    );
-    
-    if ($result === false) {
-        return ["error" => "Erreur lors de l'ajout du profil."];
+
+    $ok = addProfile($name, $image, $minAge);
+    if ($ok === false) {
+        return false;
     }
-    
-    return ["success" => "Le profil a été ajouté avec succès."];
+
+    return ['success' => 'Le profil a ete ajoute avec succes.'];
 }
 
-function readProfilesController() {
-    $profiles = getAllProfiles();
-    if ($profiles === false) {
-        return ["error" => "Erreur lors de la récupération des profils."];
-    }
-    return $profiles;
+function readProfilesController()
+{
+    return getAllProfiles();
 }

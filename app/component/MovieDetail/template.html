@@ -1,14 +1,14 @@
 <div class="movie-detail">
-  <img class="movie-detail__image" src="" alt="Affiche du film">
+  <img class="movie-detail__image" src="{{image}}" alt="Affiche du film" />
   <div class="movie-detail__info">
-    <h2 class="movie-detail__title"></h2>
-    <div class="movie-detail__desc"></div>
+    <h2 class="movie-detail__title">{{name}}</h2>
+    <div class="movie-detail__desc">{{description}}</div>
     <div class="movie-detail__meta">
-      <span class="movie-detail__director"></span> |
-      <span class="movie-detail__year"></span> |
-      <span class="movie-detail__category"></span> |
-      <span class="movie-detail__minage"></span>
+      Realisateur : <span class="movie-detail__director">{{director}}</span> |
+      Annee : <span class="movie-detail__year">{{year}}</span> | Categorie :
+      <span class="movie-detail__category">{{category}}</span> | Age min :
+      <span class="movie-detail__minage">{{minAge}}</span>
     </div>
-    <div class="movie-detail__trailer"></div>
+    <div class="movie-detail__trailer">{{trailer}}</div>
   </div>
 </div>

@@ -1,18 +1,23 @@
-let HOST_URL = "https://mmi.unilim.fr/~pideill2/SAe-2.03/";
+let HOST_URL = "..";
 
 let DataMovie = {};
 
-DataMovie.add = async function(movie) {
+DataMovie.add = async function (movie) {
   try {
-    const response = await fetch(HOST_URL + '/server/script.php?todo=addMovie', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(movie)
-    });
-    const result = await response.json();
-    return result;
+    let config = {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(movie),
+    };
+
+    let answer = await fetch(
+      HOST_URL + "/server/script.php?todo=addMovie",
+      config,
+    );
+    let data = await answer.json();
+    return data;
   } catch (e) {
-    return { error: 'Erreur de connexion au serveur.' };
+    return { error: "Erreur de connexion au serveur." };
   }
 };
 

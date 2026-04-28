@@ -1,6 +1,17 @@
 <nav class="navbar font-sans">
-  <a class="navbar__brand" href="#" aria-label="Retour accueil">FLOUFLIX</a>
-  <ul class="navbar__list">
-    <li class="navbar__item" onclick="{{hAbout}}">About</li>
-  </ul>
+  <div class="navbar__top">
+    <a class="navbar__brand" href="#" aria-label="Retour accueil">FLOUFLIX</a>
+    <ul class="navbar__list">
+      <li class="navbar__item" onclick="{{hHome}}">Accueil</li>
+      <li class="navbar__item" onclick="{{hAbout}}">About</li>
+    </ul>
+  </div>
+
+  <section class="navbar__profiles" aria-label="Choix du profil">
+    <div class="navbar__profiles-head">
+      <span class="navbar__profiles-label">Profil actif</span>
+      <strong class="navbar__profiles-current">{{currentProfileLabel}}</strong>
+    </div>
+    <div class="navbar__profiles-list">{{profiles}}</div>
+  </section>
 </nav>

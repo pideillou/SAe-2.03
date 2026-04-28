@@ -1,13 +1,12 @@
 import { Movie } from "../Movie/index.js";
 
 export let MovieCategory = {
-  render: function (categoryName, films) {
-    let el = document.createElement("div");
-    el.className = "movie-category";
-    el.innerHTML = `
+  format: function (categoryName, films) {
+    return `
+      <section class="movie-category">
       <h2 class="movie-category__title">${categoryName} <span class="movie-badge">${films.length} titres</span></h2>
-      <div class="movie-category__list">${Movie.format(films)}</div>
+      <div class="movie-category__list">${Movie.formatMany(films)}</div>
+      </section>
     `;
-    return el;
   },
 };

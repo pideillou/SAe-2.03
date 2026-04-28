@@ -1,19 +1,21 @@
-let HOST_URL = "https://mmi.unilim.fr/~pideill2/SAe-2.03/";
+let HOST_URL = "..";
 
 let DataProfile = {};
 
 DataProfile.add = async function (profile) {
   try {
-    const response = await fetch(
+    let config = {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(profile),
+    };
+
+    let answer = await fetch(
       HOST_URL + "/server/script.php?todo=addProfile",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(profile),
-      },
+      config,
     );
-    const result = await response.json();
-    return result;
+    let data = await answer.json();
+    return data;
   } catch (e) {
     return { error: "Erreur de connexion au serveur." };
   }
@@ -21,12 +23,9 @@ DataProfile.add = async function (profile) {
 
 DataProfile.getAll = async function () {
   try {
-    const response = await fetch(
-      HOST_URL + "/server/script.php?todo=readProfiles",
-    );
-    if (!response.ok) throw new Error("Erreur serveur");
-    const result = await response.json();
-    return result;
+    let answer = await fetch(HOST_URL + "/server/script.php?todo=readProfiles");
+    let data = await answer.json();
+    return data;
   } catch (e) {
     return { error: "Erreur de connexion au serveur." };
   }

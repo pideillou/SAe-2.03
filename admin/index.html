@@ -25,75 +25,100 @@
     </div>
 
     <script type="module">
-      import { setupMovieForm } from "./component/MovieForm/script.js";
-      import { setupProfileForm } from "./component/ProfileForm/script.js";
+      import { MovieForm } from "./component/MovieForm/script.js";
+      import { ProfileForm } from "./component/ProfileForm/script.js";
+      import { Log } from "./component/Log/script.js";
       import { DataMovie } from "./data/dataMovie.js";
       import { DataProfile } from "./data/dataProfile.js";
 
-      // ============ Gestion du formulaire Film ============
-      // Affiche le formulaire de film
-      fetch("./component/MovieForm/template.html", { cache: "no-store" })
-        .then((r) => r.text())
-        .then((html) => {
-          document.getElementById("formMovie").innerHTML = html;
-          setupMovieForm(addMovie);
-        });
+      window.C = {};
+      window.V = {};
 
-      function showLogMovie(msg, color = "green") {
-        const logClass =
-          color === "red"
-            ? "admin-log admin-log--error"
-            : color === "blue"
-              ? "admin-log admin-log--info"
-              : "admin-log admin-log--success";
-        document.getElementById("logMovie").innerHTML =
-          `<div class="${logClass}">${msg}</div>`;
-      }
+      const movieLog = Log.create();
+      const profileLog = Log.create();
 
-      // Fonction appelée quand on soumet le formulaire de film
-      async function addMovie(data) {
-        showLogMovie("Ajout du film en cours...", "blue");
-        const result = await DataMovie.add(data);
-        if (result && result.success) {
-          showLogMovie(result.success, "green");
-          document.getElementById("movieForm").reset();
-        } else {
-          showLogMovie(result.error || "Erreur inconnue.", "red");
+      C.handlerAddMovie = async function () {
+        let form = document.querySelector("#movieForm");
+        let formData = new FormData(form);
+
+        let data = {
+          name: formData.get("title"),
+          director: formData.get("director"),
+          year: formData.get("year"),
+          length: formData.get("duration"),
+          description: formData.get("description"),
+          id_category: formData.get("category"),
+          image: formData.get("image"),
+          trailer: formData.get("trailer"),
+          min_age: formData.get("age"),
+        };
+
+        V.renderMovieLog("Ajout du film en cours...");
+        let res = await DataMovie.add(data);
+
+        if (res && res.success) {
+          V.renderMovieLog(res.success);
+          form.reset();
+          return;
         }
-      }
 
-      // ============ Gestion du formulaire Profil ============
-      // Affiche le formulaire de profil
-      fetch("./component/ProfileForm/template.html", { cache: "no-store" })
-        .then((r) => r.text())
-        .then((html) => {
-          document.getElementById("formProfile").innerHTML = html;
-          setupProfileForm(addProfile);
-        });
+        V.renderMovieLog(
+          (res && res.error) || "Erreur lors de l'ajout du film.",
+        );
+      };
 
-      // Affiche un message dans la zone log profil
-      function showLogProfile(msg, color = "green") {
-        const logClass =
-          color === "red"
-            ? "admin-log admin-log--error"
-            : color === "blue"
-              ? "admin-log admin-log--info"
-              : "admin-log admin-log--success";
-        document.getElementById("logProfile").innerHTML =
-          `<div class="${logClass}">${msg}</div>`;
-      }
+      C.handlerAddProfile = async function () {
+        let form = document.querySelector("#profileForm");
+        let formData = new FormData(form);
 
-      // Fonction appelée quand on soumet le formulaire de profil
-      async function addProfile(data) {
-        showLogProfile("Ajout du profil en cours...", "blue");
-        const result = await DataProfile.add(data);
-        if (result && result.success) {
-          showLogProfile(result.success, "green");
-          document.getElementById("profileForm").reset();
-        } else {
-          showLogProfile(result.error || "Erreur inconnue.", "red");
+        let data = {
+          name: formData.get("name"),
+          image: formData.get("image"),
+          min_age: formData.get("min_age"),
+        };
+
+        V.renderProfileLog("Ajout du profil en cours...");
+        let res = await DataProfile.add(data);
+
+        if (res && res.success) {
+          V.renderProfileLog(res.success);
+          form.reset();
+          return;
         }
-      }
+
+        V.renderProfileLog(
+          (res && res.error) || "Erreur lors de l'ajout du profil.",
+        );
+      };
+
+      C.start = function () {
+        V.renderMovieForm("C.handlerAddMovie()");
+        V.renderProfileForm("C.handlerAddProfile()");
+        V.renderMovieLog("Bienvenue sur le backoffice Flouflix.");
+        V.renderProfileLog("Ajoutez un profil pour filtrer les acces.");
+      };
+
+      V.renderMovieLog = function (txt) {
+        let content = document.querySelector("#logMovie");
+        content.innerHTML = movieLog.format(txt);
+      };
+
+      V.renderProfileLog = function (txt) {
+        let content = document.querySelector("#logProfile");
+        content.innerHTML = profileLog.format(txt);
+      };
+
+      V.renderMovieForm = function (handler) {
+        let content = document.querySelector("#formMovie");
+        content.innerHTML = MovieForm.format(handler);
+      };
+
+      V.renderProfileForm = function (handler) {
+        let content = document.querySelector("#formProfile");
+        content.innerHTML = ProfileForm.format(handler);
+      };
+
+      C.start();
     </script>
   </body>
 </html>

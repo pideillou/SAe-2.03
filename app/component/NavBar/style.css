@@ -1,11 +1,18 @@
 .navbar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   width: min(96vw, 84rem);
   margin: 0 auto;
-  padding: 1.1rem 0;
+  padding: 1rem 0 0.9rem;
   color: var(--color-fg);
+}
+
+.navbar__top {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
 #header {
@@ -27,6 +34,93 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
+}
+
+.navbar__profiles {
+  width: 100%;
+  margin-top: 0.95rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.navbar__profiles-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.navbar__profiles-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.navbar__profiles-current {
+  color: var(--color-fg);
+  font-size: 0.95rem;
+}
+
+.navbar__profiles-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.navbar__profiles-empty {
+  color: var(--color-gray);
+  font-size: 0.95rem;
+}
+
+.navbar__profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem 0.55rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
+}
+
+.navbar__profile:hover {
+  border-color: var(--color-accent);
+  background-color: rgba(102, 102, 102, 0.08);
+  transform: translateY(-1px);
+}
+
+.navbar__profile--active {
+  border-color: var(--color-accent);
+  background-color: rgba(102, 102, 102, 0.12);
+}
+
+.navbar__profile-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.navbar__profile-avatar--initial {
+  background: var(--color-gray-dark);
+  color: var(--color-white);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.navbar__profile-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-fg);
 }
 
 .navbar__item {
@@ -52,6 +146,11 @@
     padding: 0.85rem 0;
   }
 
+  .navbar__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .navbar__brand {
     font-size: 1.3rem;
   }
@@ -59,5 +158,9 @@
   .navbar__item {
     font-size: 0.9rem;
     padding: 0.45rem 0.85rem;
+  }
+
+  .navbar__profiles-list {
+    gap: 0.55rem;
   }
 }

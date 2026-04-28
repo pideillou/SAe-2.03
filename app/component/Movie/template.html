@@ -1,1 +1,11 @@
-<div class="movie-grid" id="movieGrid"></div>
+<article class="movie-card" onclick="{{handler}}">
+  <img src="{{image}}" alt="{{name}}" />
+  <div class="movie-info">
+    <div class="movie-title">{{name}}</div>
+    <div class="movie-desc">{{description}}</div>
+    <div class="movie-meta">
+      <span class="movie-badge">{{year}}</span>
+      <span class="movie-play" aria-hidden="true">▶</span>
+    </div>
+  </div>
+</article>
