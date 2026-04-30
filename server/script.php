@@ -26,7 +26,8 @@ if (isset($_REQUEST['todo'])) {
 
     switch ($todo) {
         case 'readMovies':
-            $data = readMoviesController();
+            $age = isset($_REQUEST['age']) ? (int) $_REQUEST['age'] : 0;
+            $data = readMoviesController($age);
             break;
 
         case 'addMovie':
@@ -37,15 +38,37 @@ if (isset($_REQUEST['todo'])) {
             $data = readMovieDetailController();
             break;
 
+        case 'readFeaturedMovies':
+            $data = readFeaturedMoviesController();
+            break;
+
         case 'addProfile':
             $data = addProfileController();
+            break;
+
+        case 'saveProfile':
+            $data = saveProfileController();
             break;
 
         case 'readProfiles':
             $data = readProfilesController();
             break;
 
-        default:
+        case 'addFavorite':
+            $data = addFavoriteController();
+            break;
+
+        case 'removeFavorite':
+            $data = removeFavoriteController();
+            break;
+
+        case 'readFavorites':
+            $data = readFavoritesController();
+            break;
+
+        case 'getStatistics':
+            $data = getStatisticsController();
+            break;
             sendJson(['error' => 'Unknown todo value'], 400);
     }
 

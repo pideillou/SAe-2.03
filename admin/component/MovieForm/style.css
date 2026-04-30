@@ -25,9 +25,15 @@
   border-radius: 999px;
   display: grid;
   place-items: center;
-  font-size: 1.3rem;
-  color: var(--color-white);
   background: var(--color-accent);
+  overflow: hidden;
+}
+
+.movie-form__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .movie-form__kicker {

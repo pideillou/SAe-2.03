@@ -33,6 +33,8 @@
 
       window.C = {};
       window.V = {};
+      C.profileList = [];
+      C.activeProfileId = "";
 
       const movieLog = Log.create();
       const profileLog = Log.create();
@@ -67,35 +69,76 @@
         );
       };
 
-      C.handlerAddProfile = async function () {
+      C.handlerSelectProfileToEdit = function (profileId) {
+        C.activeProfileId = profileId;
+        V.renderProfileForm(
+          "C.handlerSaveProfile()",
+          "C.handlerSelectProfileToEdit(this.value)",
+        );
+      };
+
+      C.loadProfiles = async function (selectedId) {
+        let profiles = await DataProfile.getAll();
+
+        if (!Array.isArray(profiles)) {
+          V.renderProfileLog(
+            (profiles && profiles.error) ||
+              "Erreur lors du chargement des profils.",
+          );
+          return;
+        }
+
+        C.profileList = profiles;
+        if (selectedId !== undefined) {
+          C.activeProfileId = selectedId;
+        }
+        return profiles;
+      };
+
+      C.handlerSaveProfile = async function () {
         let form = document.querySelector("#profileForm");
         let formData = new FormData(form);
 
+        let profileId = formData.get("id");
+
         let data = {
+          id: profileId,
           name: formData.get("name"),
           image: formData.get("image"),
           min_age: formData.get("min_age"),
         };
 
-        V.renderProfileLog("Ajout du profil en cours...");
-        let res = await DataProfile.add(data);
+        V.renderProfileLog("Enregistrement du profil en cours...");
+        let res = await DataProfile.save(data);
 
         if (res && res.success) {
           V.renderProfileLog(res.success);
-          form.reset();
+          await C.loadProfiles(res.id || profileId || "");
+          V.renderProfileForm(
+            "C.handlerSaveProfile()",
+            "C.handlerSelectProfileToEdit(this.value)",
+          );
           return;
         }
 
         V.renderProfileLog(
-          (res && res.error) || "Erreur lors de l'ajout du profil.",
+          (res && res.error) || "Erreur lors de l'enregistrement du profil.",
         );
       };
 
-      C.start = function () {
+      C.start = async function () {
         V.renderMovieForm("C.handlerAddMovie()");
-        V.renderProfileForm("C.handlerAddProfile()");
         V.renderMovieLog("Bienvenue sur le backoffice Flouflix.");
-        V.renderProfileLog("Ajoutez un profil pour filtrer les acces.");
+        V.renderProfileLog(
+          "Chargez un profil existant ou creez-en un nouveau.",
+        );
+        await C.loadProfiles();
+        V.renderProfileForm(
+          "C.handlerSaveProfile()",
+          "C.handlerSelectProfileToEdit(this.value)",
+          C.profileList,
+          C.activeProfileId,
+        );
       };
 
       V.renderMovieLog = function (txt) {
@@ -113,9 +156,14 @@
         content.innerHTML = MovieForm.format(handler);
       };
 
-      V.renderProfileForm = function (handler) {
+      V.renderProfileForm = function (handler, handlerSelectProfile) {
         let content = document.querySelector("#formProfile");
-        content.innerHTML = ProfileForm.format(handler);
+        content.innerHTML = ProfileForm.format(
+          handler,
+          handlerSelectProfile,
+          C.profileList,
+          C.activeProfileId,
+        );
       };
 
       C.start();

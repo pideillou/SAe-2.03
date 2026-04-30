@@ -2,7 +2,7 @@ let HOST_URL = "..";
 
 let DataProfile = {};
 
-DataProfile.add = async function (profile) {
+DataProfile.save = async function (profile) {
   try {
     let config = {
       method: "POST",
@@ -11,7 +11,7 @@ DataProfile.add = async function (profile) {
     };
 
     let answer = await fetch(
-      HOST_URL + "/server/script.php?todo=addProfile",
+      HOST_URL + "/server/script.php?todo=saveProfile",
       config,
     );
     let data = await answer.json();
@@ -29,6 +29,10 @@ DataProfile.getAll = async function () {
   } catch (e) {
     return { error: "Erreur de connexion au serveur." };
   }
+};
+
+DataProfile.add = async function (profile) {
+  return DataProfile.save(profile);
 };
 
 export { DataProfile };

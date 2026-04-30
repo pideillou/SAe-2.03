@@ -4,12 +4,32 @@
   onsubmit="{{handler}}; return false;"
 >
   <div class="profile-form__hero">
-    <div class="profile-form__avatar" aria-hidden="true">F</div>
+    <div class="profile-form__avatar" aria-hidden="true">
+      <img src="../server/images/logo.png" alt="Logo Flouflix" />
+    </div>
     <div>
       <p class="profile-form__kicker">Gestion des accès</p>
-      <p class="profile-form__subtitle">Crée un profil avec son âge minimum</p>
+      <p class="profile-form__subtitle">
+        Crée ou modifie un profil utilisateur
+      </p>
     </div>
   </div>
+
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileToEdit"
+      >Profil à modifier</label
+    >
+    <select
+      class="profile-form__input"
+      id="profileToEdit"
+      name="profile_to_edit"
+      onchange="{{handlerSelectProfile}}"
+    >
+      {{profileOptions}}
+    </select>
+  </div>
+
+  <input type="hidden" id="profileId" name="id" value="{{profileId}}" />
 
   <div class="profile-form__group">
     <label class="profile-form__label" for="profileName">Nom du profil *</label>
@@ -19,6 +39,7 @@
       id="profileName"
       name="name"
       required
+      value="{{profileName}}"
       placeholder="Ex: Enfants, Adultes, Adolescents..."
     />
   </div>
@@ -31,6 +52,7 @@
       type="text"
       id="profileImage"
       name="image"
+      value="{{profileImage}}"
       placeholder="Ex: avatar_kids.jpg"
     />
   </div>
@@ -44,18 +66,11 @@
       name="min_age"
       required
     >
-      <option value="">--Sélectionnez une restriction d'âge--</option>
-      <option value="0">0 - Tous publics</option>
-      <option value="3">3 ans+</option>
-      <option value="6">6 ans+</option>
-      <option value="8">8 ans+</option>
-      <option value="10">10 ans+</option>
-      <option value="12">12 ans+</option>
-      <option value="14">14 ans+</option>
-      <option value="16">16 ans+</option>
-      <option value="18">18 ans+ (Adultes)</option>
+      {{minAgeOptions}}
     </select>
   </div>
 
-  <button class="profile-form__button" type="submit">Ajouter le profil</button>
+  <button class="profile-form__button" type="submit">
+    Enregistrer le profil
+  </button>
 </form>

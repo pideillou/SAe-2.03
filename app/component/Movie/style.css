@@ -109,9 +109,6 @@
   line-height: 1.25;
   margin-bottom: 0.35rem;
   text-align: left;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
@@ -122,10 +119,8 @@
   line-height: 1.45;
   margin-top: 0;
   display: block;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  max-height: calc(1.45em * 3);
 }
 
 .movie-meta {
@@ -149,21 +144,80 @@
 }
 
 .movie-play {
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 1.6rem;
+  height: 1.6rem;
   border-radius: 50%;
   border: 1px solid var(--color-border);
   color: var(--color-fg);
   display: grid;
   place-items: center;
-  font-size: 0.72rem;
   background: var(--color-white);
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
 }
 
 .movie-card:hover .movie-play {
   background-color: var(--color-accent);
   color: var(--color-white);
+}
+
+.movie-favorite {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-white);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+  padding: 0;
+}
+
+.movie-favorite:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+
+.movie-favorite--active {
+  background: rgba(255, 182, 193, 0.95);
+  transform: scale(1.03);
+}
+
+/* SVG sizing and color rules for favorite button */
+.movie-favorite svg {
+  display: block;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* default: outline heart (stroke visible, no fill) */
+.movie-favorite:not(.movie-favorite--active) svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+/* active: filled red heart */
+.movie-favorite.movie-favorite--active svg path {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* button color contexts */
+.movie-favorite {
+  color: #666666;
+}
+.movie-favorite.movie-favorite--active {
+  color: #e11;
 }
 
 .no-movie-msg {

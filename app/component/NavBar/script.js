@@ -20,10 +20,19 @@ function getProfileInitial(profile) {
   return label ? label.charAt(0).toUpperCase() : "P";
 }
 
-NavBar.format = function (hAbout, hHome, profiles, activeProfileId) {
+NavBar.format = function (
+  hAbout,
+  hHome,
+  hFavorites,
+  hStatistics,
+  profiles,
+  activeProfileId,
+) {
   let html = template;
   html = html.replace("{{hAbout}}", hAbout);
   html = html.replace("{{hHome}}", hHome);
+  html = html.replace("{{hFavorites}}", hFavorites);
+  html = html.replace("{{hStatistics}}", hStatistics);
 
   let currentProfile = profiles.find(function (profile) {
     return String(profile.id) === String(activeProfileId);

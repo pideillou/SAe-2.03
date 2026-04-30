@@ -11,6 +11,15 @@
   <body>
     <header id="header"></header>
 
+    <section class="catalog-hero" aria-label="Flouflix selection du moment">
+      <p class="catalog-hero__kicker">Plateforme de streaming</p>
+      <h1 class="catalog-hero__title">FLOUFLIX</h1>
+      <p class="catalog-hero__text">
+        Explore des catalogues par univers, decouvre des fiches détaillées et
+        lance ta prochaine soirée cinéma.
+      </p>
+    </section>
+
     <section id="content"></section>
 
     <script type="module">
@@ -19,11 +28,17 @@
       import { DataProfile } from "./data/dataProfile.js";
       import { MovieCategory } from "./component/MovieCategory/script.js";
       import { MovieDetail } from "./component/MovieDetail/script.js";
+      import { Favorites } from "./component/Favorites/script.js";
+      import { Statistics } from "./component/Statistics/script.js";
 
       window.C = {};
       window.V = {};
       C.activeProfileId = null;
       C.profiles = [];
+      C.favorites = [];
+      C.featured = [];
+      C.menuRenderVersion = 0;
+      C.favoriteMessage = "";
 
       C.handlerAbout = function () {
         alert("Ceci est une base de projet pour la SAE2.03. Bonne chance !");
@@ -32,11 +47,36 @@
       C.handlerSelectProfile = function (profileId) {
         C.activeProfileId = profileId;
         V.renderNavBar();
+        V.loadFavorites();
+        V.loadFeaturedMovies();
         V.renderMenu();
+      };
+
+      C.getActiveProfileAge = function () {
+        if (!C.activeProfileId) {
+          return 0;
+        }
+
+        let activeProfile = C.profiles.find(function (profile) {
+          return String(profile.id) === String(C.activeProfileId);
+        });
+
+        let age = activeProfile ? Number(activeProfile.min_age) : 0;
+        return Number.isNaN(age) ? 0 : age;
       };
 
       C.handlerHome = function () {
         V.renderMenu();
+        return false;
+      };
+
+      C.handlerFavorites = function () {
+        V.renderFavorites();
+        return false;
+      };
+
+      C.handlerStatistics = function () {
+        V.renderStatistics();
         return false;
       };
 
@@ -49,6 +89,44 @@
         V.renderMovieDetail(movie);
       };
 
+      C.handlerAddFavorite = async function (movieId) {
+        if (!C.activeProfileId) {
+          alert("Veuillez selectionner un profil.");
+          return;
+        }
+
+        let result = await DataMovie.addFavorite(C.activeProfileId, movieId);
+        if (result.error) {
+          alert(result.error);
+          return;
+        }
+
+        await V.loadFavorites();
+        C.favoriteMessage =
+          result.success || "Le film a ete ajoute a vos favoris.";
+        V.renderMessage();
+        V.renderMenu();
+      };
+
+      C.handlerRemoveFavorite = async function (movieId) {
+        if (!C.activeProfileId) {
+          alert("Veuillez selectionner un profil.");
+          return;
+        }
+
+        let result = await DataMovie.removeFavorite(C.activeProfileId, movieId);
+        if (result.error) {
+          alert(result.error);
+          return;
+        }
+
+        await V.loadFavorites();
+        C.favoriteMessage =
+          result.success || "Le film a ete supprime de vos favoris.";
+        V.renderMessage();
+        V.renderMenu();
+      };
+
       C.start = function () {
         V.renderApp();
       };
@@ -58,6 +136,8 @@
         header.innerHTML = NavBar.format(
           "C.handlerAbout()",
           "C.handlerHome()",
+          "C.handlerFavorites()",
+          "C.handlerStatistics()",
           C.profiles,
           C.activeProfileId,
         );
@@ -81,37 +161,131 @@
         }
 
         V.renderNavBar();
+        await V.loadFavorites();
+        await V.loadFeaturedMovies();
         V.renderMenu();
       };
 
-      V.renderMenu = async function () {
-        let content = document.querySelector("#content");
-        content.innerHTML = `
-          <section class="catalog-hero" aria-label="Flouflix selection du moment">
-            <p class="catalog-hero__kicker">Plateforme de streaming</p>
-            <h1 class="catalog-hero__title">FLOUFLIX</h1>
-            <p class="catalog-hero__text">
-              Explore des catalogues par univers, decouvre des fiches detaillees et lance ta prochaine soiree cinema.
-            </p>
-          </section>
-        `;
+      V.loadFavorites = async function () {
+        if (!C.activeProfileId) {
+          C.favorites = [];
+          return;
+        }
 
-        let grouped = await DataMovie.requestMoviesByCategory();
+        let favorites = await DataMovie.getFavorites(C.activeProfileId);
+        if (Array.isArray(favorites)) {
+          C.favorites = favorites;
+        } else {
+          C.favorites = [];
+        }
+      };
+
+      V.loadFeaturedMovies = async function () {
+        let ageLimit = C.getActiveProfileAge();
+        let featured = await DataMovie.getFeaturedMovies(ageLimit);
+        if (Array.isArray(featured)) {
+          C.featured = featured;
+        } else {
+          C.featured = [];
+        }
+      };
+
+      V.renderMessage = function () {
+        if (!C.favoriteMessage) return;
+
+        let msg = document.querySelector("#favoriteMessage");
+        if (!msg) {
+          let content = document.querySelector("#content");
+          msg = document.createElement("div");
+          msg.id = "favoriteMessage";
+          msg.style.cssText =
+            "background:#d4edda;color:#155724;padding:10px;border-radius:4px;margin-bottom:20px;";
+          content.insertBefore(msg, content.firstChild);
+        }
+
+        msg.textContent = C.favoriteMessage;
+        setTimeout(function () {
+          C.favoriteMessage = "";
+          if (msg) msg.style.display = "none";
+        }, 3000);
+      };
+
+      V.renderMenu = async function () {
+        const renderVersion = ++C.menuRenderVersion;
+        const requestedProfileId = C.activeProfileId;
+        let content = document.querySelector("#content");
+        content.innerHTML = "";
+
+        let ageLimit = C.getActiveProfileAge();
+        let grouped = await DataMovie.requestMoviesByCategory(ageLimit);
+
+        if (
+          renderVersion !== C.menuRenderVersion ||
+          String(requestedProfileId) !== String(C.activeProfileId)
+        ) {
+          return;
+        }
+
         if (!grouped || grouped.error) {
           V.renderError("Erreur lors du chargement des films.");
           return;
         }
 
         let html = "";
-        for (let category in grouped) {
-          html += MovieCategory.format(category, grouped[category]);
+
+        // Affichage uniquement des films mis en avant et des catégories, PAS les favoris
+        if (C.featured && C.featured.length > 0) {
+          html += MovieCategory.format(
+            `Films mis en avant`,
+            C.featured,
+            C.favorites,
+          );
+        } else {
+          html +=
+            '<section class="movie-category" style="margin-bottom: 2rem;"><h2 class="movie-category__title">Films mis en avant</h2><div style="color:#999999;text-align:center;padding:2rem;">Aucun film mis en avant pour le moment.</div></section>';
         }
-        content.innerHTML += html;
+
+        if (Object.keys(grouped).length === 0) {
+          html +=
+            '<div style="color:#999999;text-align:center;padding:2rem;">Aucun film disponible pour votre tranche d\'age.</div>';
+        } else {
+          for (let category in grouped) {
+            html += MovieCategory.format(
+              category,
+              grouped[category],
+              C.favorites,
+            );
+          }
+        }
+        content.innerHTML = html;
       };
 
       V.renderMovieDetail = function (movie) {
         let content = document.querySelector("#content");
         content.innerHTML = MovieDetail.format(movie);
+      };
+
+      V.renderFavorites = function () {
+        let content = document.querySelector("#content");
+        if (!C.activeProfileId) {
+          content.innerHTML =
+            '<div style="color:#999999;text-align:center;padding:2rem;">Veuillez selectionner un profil pour voir vos favoris.</div>';
+          return;
+        }
+
+        content.innerHTML = Favorites.formatSimple(C.favorites);
+      };
+
+      V.renderStatistics = async function () {
+        let content = document.querySelector("#content");
+        let stats = await DataMovie.getStatistics();
+
+        if (stats.error) {
+          V.renderError("Erreur lors du chargement des statistiques.");
+          return;
+        }
+
+        content.innerHTML = Statistics.format(stats);
       };
 
       V.renderError = function (txt) {
