@@ -66,6 +66,10 @@
       };
 
       C.handlerHome = function () {
+        let searchInput = document.querySelector("#searchInput");
+        if (searchInput) {
+          searchInput.value = "";
+        }
         V.renderMenu();
         return false;
       };
@@ -125,6 +129,29 @@
           result.success || "Le film a ete supprime de vos favoris.";
         V.renderMessage();
         V.renderMenu();
+      };
+
+      C.handlerSearch = async function () {
+        let searchInput = document.querySelector("#searchInput");
+        if (!searchInput) {
+          return;
+        }
+
+        let query = searchInput.value.trim();
+        if (query === "") {
+          V.renderMenu();
+          return;
+        }
+
+        let ageLimit = C.getActiveProfileAge();
+        let results = await DataMovie.searchMovies(query, ageLimit);
+
+        if (!results || results.error) {
+          V.renderSearchResults([], query);
+          return;
+        }
+
+        V.renderSearchResults(results, query);
       };
 
       C.start = function () {
@@ -260,9 +287,208 @@
         content.innerHTML = html;
       };
 
-      V.renderMovieDetail = function (movie) {
+      V.escapeHtml = function (value) {
+        return String(value ?? "").replace(/[&<>"]|'/g, function (character) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[character];
+        });
+      };
+
+      V.formatCommentDate = function (value) {
+        if (!value) return "";
+        const date = new Date(String(value).replace(" ", "T"));
+        if (Number.isNaN(date.getTime())) {
+          return String(value);
+        }
+
+        return new Intl.DateTimeFormat("fr-FR", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(date);
+      };
+
+      V.renderMovieRatings = async function (movieId) {
+        const rating = await DataMovie.getMovieRating(
+          movieId,
+          C.activeProfileId || 0,
+        );
+        const avgEl = document.querySelector("#movieRatingAvg");
+        const cntEl = document.querySelector("#movieRatingCount");
+        const userArea = document.querySelector("#movieUserRatingArea");
+        const msgEl = document.querySelector("#movieRatingMessage");
+
+        if (!rating || rating.error) {
+          if (avgEl) avgEl.textContent = "-";
+          if (cntEl) cntEl.textContent = "0";
+          if (userArea) userArea.innerHTML = "";
+          return;
+        }
+
+        if (avgEl) avgEl.textContent = rating.average || 0;
+        if (cntEl) cntEl.textContent = rating.count || 0;
+
+        if (!C.activeProfileId) {
+          if (userArea) {
+            userArea.innerHTML =
+              '<div style="color:#666;">Connectez-vous pour noter ce film.</div>';
+          }
+          return;
+        }
+
+        if (rating.user_score !== undefined && rating.user_score !== null) {
+          if (userArea) {
+            userArea.innerHTML =
+              '<div style="color:#333;">Vous avez noté ce film : <strong>' +
+              rating.user_score +
+              "/10</strong></div>";
+          }
+          return;
+        }
+
+        if (userArea) {
+          userArea.innerHTML =
+            '<div class="movie-detail__comment-form-label">Votre note</div>' +
+            '<div class="movie-detail__comment-form-actions">' +
+            '<select id="movieScoreSelect">' +
+            Array.from(
+              { length: 11 },
+              (_, i) => '<option value="' + i + '">' + i + "</option>",
+            ).join("") +
+            "</select>" +
+            '<button id="movieScoreBtn" class="movie-detail__comment-button" type="button">Noter</button>' +
+            "</div>";
+
+          const btn = document.querySelector("#movieScoreBtn");
+          if (btn) {
+            btn.addEventListener("click", async function () {
+              const sel = document.querySelector("#movieScoreSelect");
+              const score = Number(sel.value);
+              const res = await DataMovie.addRating(
+                C.activeProfileId,
+                movieId,
+                score,
+              );
+              if (res && res.error) {
+                alert(res.error);
+                return;
+              }
+
+              if (msgEl) {
+                msgEl.style.display = "block";
+                msgEl.textContent =
+                  res.success || "Votre note a ete enregistree.";
+              }
+
+              await V.renderMovieRatings(movieId);
+            });
+          }
+        }
+      };
+
+      V.renderMovieComments = async function (movie) {
+        const commentsBox = document.querySelector("#movieCommentsList");
+        const summaryBox = document.querySelector("#movieCommentsSummary");
+        const formArea = document.querySelector("#movieCommentFormArea");
+        const messageBox = document.querySelector("#movieCommentMessage");
+
+        if (!commentsBox || !summaryBox || !formArea || !messageBox) {
+          return;
+        }
+
+        const comments = await DataMovie.getMovieComments(movie.id);
+        if (!comments || comments.error) {
+          summaryBox.textContent = "Impossible de charger les commentaires.";
+          commentsBox.innerHTML = "";
+          formArea.innerHTML = "";
+          messageBox.textContent = "";
+          return;
+        }
+
+        summaryBox.textContent =
+          comments.length > 0
+            ? comments.length +
+              " commentaire" +
+              (comments.length > 1 ? "s" : "")
+            : "";
+
+        if (!Array.isArray(comments) || comments.length === 0) {
+          commentsBox.innerHTML =
+            '<div class="movie-detail__comment-empty">Aucun commentaire pour ce film. Soyez le premier à en laisser un !</div>';
+        } else {
+          commentsBox.innerHTML = comments
+            .map(function (comment) {
+              return (
+                '<article class="movie-detail__comment-item">' +
+                '<div class="movie-detail__comment-header">' +
+                '<span class="movie-detail__comment-profile">' +
+                V.escapeHtml(comment.profile_name || "Profil inconnu") +
+                '</span><span class="movie-detail__comment-date">' +
+                V.formatCommentDate(comment.created_at) +
+                "</span></div>" +
+                '<div class="movie-detail__comment-text">' +
+                V.escapeHtml(comment.comment_text || "") +
+                "</div></article>"
+              );
+            })
+            .join("");
+        }
+
+        if (!C.activeProfileId) {
+          formArea.innerHTML =
+            '<div style="color:#666;">Connectez-vous à un profil pour laisser un commentaire.</div>';
+          messageBox.textContent = "";
+          return;
+        }
+
+        formArea.innerHTML =
+          '<label class="movie-detail__comment-form-label" for="movieCommentText">Ajouter un commentaire</label>' +
+          '<textarea id="movieCommentText" class="movie-detail__comment-form-textarea" maxlength="1000" placeholder="Écrivez votre commentaire ici..."></textarea>' +
+          '<div class="movie-detail__comment-form-actions">' +
+          '<button id="movieCommentBtn" class="movie-detail__comment-button" type="button">Publier</button>' +
+          "</div>";
+
+        const submitButton = document.querySelector("#movieCommentBtn");
+        if (submitButton) {
+          submitButton.addEventListener("click", async function () {
+            const textArea = document.querySelector("#movieCommentText");
+            const commentText = textArea ? textArea.value.trim() : "";
+
+            if (commentText === "") {
+              alert("Le commentaire ne peut pas être vide.");
+              return;
+            }
+
+            const result = await DataMovie.addComment(
+              C.activeProfileId,
+              movie.id,
+              commentText,
+            );
+
+            if (result && result.error) {
+              alert(result.error);
+              return;
+            }
+
+            if (messageBox) {
+              messageBox.textContent =
+                result.success || "Votre commentaire a ete enregistre.";
+            }
+
+            await V.renderMovieComments(movie);
+          });
+        }
+      };
+
+      V.renderMovieDetail = async function (movie) {
         let content = document.querySelector("#content");
         content.innerHTML = MovieDetail.format(movie);
+        await V.renderMovieRatings(movie.id);
+        await V.renderMovieComments(movie);
       };
 
       V.renderFavorites = function () {
@@ -291,6 +517,42 @@
       V.renderError = function (txt) {
         let content = document.querySelector("#content");
         content.innerHTML = '<div style="color:#999999">' + txt + "</div>";
+      };
+
+      V.renderSearchResults = function (results, query) {
+        let content = document.querySelector("#content");
+        let html = "";
+
+        html += '<div style="margin-bottom: 1.5rem;">';
+        html +=
+          '<h2 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Résultats de recherche</h2>';
+        html +=
+          '<p style="color: #999999; font-size: 0.95rem;">Recherche : "<strong>' +
+          query +
+          '</strong>"</p>';
+        html += "</div>";
+
+        if (!Array.isArray(results) || results.length === 0) {
+          html +=
+            '<div style="color:#999999;text-align:center;padding:2rem;background:#f5f5f5;border-radius:4px;">';
+          html +=
+            '<p style="font-size: 1rem;">Aucun film ne correspond à votre recherche.</p>';
+          html +=
+            '<p style="font-size: 0.9rem; margin-top: 0.5rem;">Essayez une autre requête ou consultez le catalogue complet.</p>';
+          html += "</div>";
+        } else {
+          html += MovieCategory.format(
+            "Résultats (" +
+              results.length +
+              " film" +
+              (results.length > 1 ? "s" : "") +
+              ")",
+            results,
+            C.favorites,
+          );
+        }
+
+        content.innerHTML = html;
       };
 
       C.start();

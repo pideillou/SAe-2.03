@@ -38,8 +38,44 @@ if (isset($_REQUEST['todo'])) {
             $data = readMovieDetailController();
             break;
 
+        case 'searchMovies':
+            $data = searchMoviesController();
+            break;
+
         case 'readFeaturedMovies':
             $data = readFeaturedMoviesController();
+            break;
+
+        case 'updateMovieFeatured':
+            $data = updateMovieFeaturedController();
+            break;
+
+        case 'addRating':
+            $data = addRatingController();
+            break;
+
+        case 'getMovieRating':
+            $data = getMovieRatingController();
+            break;
+
+        case 'addComment':
+            $data = addCommentController();
+            break;
+
+        case 'readMovieComments':
+            $data = readMovieCommentsController();
+            break;
+
+        case 'readPendingMovieComments':
+            $data = readPendingMovieCommentsController();
+            break;
+
+        case 'approveMovieComment':
+            $data = approveMovieCommentController();
+            break;
+
+        case 'deleteMovieComment':
+            $data = deleteMovieCommentController();
             break;
 
         case 'addProfile':
@@ -69,7 +105,6 @@ if (isset($_REQUEST['todo'])) {
         case 'getStatistics':
             $data = getStatisticsController();
             break;
-            sendJson(['error' => 'Unknown todo value'], 400);
     }
 
     if ($data === false) {

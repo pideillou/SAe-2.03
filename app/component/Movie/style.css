@@ -51,7 +51,7 @@
 
 .movie-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   gap: 1.1rem;
   padding: 0.2rem 0;
   justify-items: center;
@@ -77,6 +77,29 @@
     border-color 0.25s ease;
 }
 
+.movie-tag {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.movie-tag--new {
+  background: #111111;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
 .movie-card:hover {
   transform: translateY(-4px);
   border-color: var(--color-accent);
@@ -86,6 +109,7 @@
 .movie-card img {
   width: 100%;
   aspect-ratio: 2/3;
+  flex: 0 0 auto;
   object-fit: cover;
   margin: 0;
   display: block;

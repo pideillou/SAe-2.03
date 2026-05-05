@@ -61,6 +61,29 @@ DataMovie.requestMoviesByCategory = async function (ageLimit = 0) {
   return grouped;
 };
 
+DataMovie.searchMovies = async function (query, ageLimit = 0) {
+  try {
+    let answer = await fetch(
+      HOST_URL +
+        "/server/script.php?todo=searchMovies&query=" +
+        encodeURIComponent(query) +
+        "&age=" +
+        ageLimit,
+    );
+    let data = await readJsonResponse(answer);
+
+    if (!answer.ok) {
+      return {
+        error: data.error || "Erreur serveur lors de la recherche.",
+      };
+    }
+
+    return data;
+  } catch (e) {
+    return { error: "Erreur reseau lors de la recherche." };
+  }
+};
+
 DataMovie.requestMovieDetails = async function (id) {
   try {
     let answer = await fetch(
@@ -181,6 +204,113 @@ DataMovie.getFeaturedMovies = async function (ageLimit = 0) {
     return {
       error: "Erreur reseau lors du chargement des films mis en avant.",
     };
+  }
+};
+
+DataMovie.addRating = async function (idProfile, idMovie, score) {
+  try {
+    let config = {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        id_profile: idProfile,
+        id_movie: idMovie,
+        score: score,
+      }),
+    };
+
+    let answer = await fetch(
+      HOST_URL + "/server/script.php?todo=addRating",
+      config,
+    );
+    let data = await readJsonResponse(answer);
+
+    if (!answer.ok) {
+      return {
+        error:
+          data.error || "Erreur serveur lors de l'enregistrement de la note.",
+      };
+    }
+
+    return data;
+  } catch (e) {
+    return { error: "Erreur reseau lors de l'enregistrement de la note." };
+  }
+};
+
+DataMovie.getMovieRating = async function (idMovie, idProfile = 0) {
+  try {
+    let url =
+      HOST_URL + "/server/script.php?todo=getMovieRating&id_movie=" + idMovie;
+    if (idProfile && idProfile > 0) {
+      url += "&id_profile=" + idProfile;
+    }
+    let answer = await fetch(url);
+    let data = await readJsonResponse(answer);
+
+    if (!answer.ok) {
+      return {
+        error: data.error || "Erreur serveur lors du chargement des notes.",
+      };
+    }
+
+    return data;
+  } catch (e) {
+    return { error: "Erreur reseau lors du chargement des notes." };
+  }
+};
+
+DataMovie.addComment = async function (idProfile, idMovie, commentText) {
+  try {
+    let config = {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        id_profile: idProfile,
+        id_movie: idMovie,
+        comment_text: commentText,
+      }),
+    };
+
+    let answer = await fetch(
+      HOST_URL + "/server/script.php?todo=addComment",
+      config,
+    );
+    let data = await readJsonResponse(answer);
+
+    if (!answer.ok) {
+      return {
+        error:
+          data.error ||
+          "Erreur serveur lors de l'enregistrement du commentaire.",
+      };
+    }
+
+    return data;
+  } catch (e) {
+    return { error: "Erreur reseau lors de l'enregistrement du commentaire." };
+  }
+};
+
+DataMovie.getMovieComments = async function (idMovie) {
+  try {
+    let answer = await fetch(
+      HOST_URL +
+        "/server/script.php?todo=readMovieComments&id_movie=" +
+        idMovie,
+    );
+    let data = await readJsonResponse(answer);
+
+    if (!answer.ok) {
+      return {
+        error:
+          data.error || "Erreur serveur lors du chargement des commentaires.",
+      };
+    }
+
+    return data;
+  } catch (e) {
+    return { error: "Erreur reseau lors du chargement des commentaires." };
   }
 };
 

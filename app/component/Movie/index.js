@@ -19,6 +19,10 @@ Movie.format = function (movie, isFavorite = false) {
   let html = template;
   html = html.replace("{{handler}}", "C.handlerDetail(" + movie.id + ")");
   html = html.replace(
+    "{{newHidden}}",
+    movie.is_new ? "" : 'aria-hidden="true" hidden',
+  );
+  html = html.replace(
     "{{image}}",
     movie.image
       ? "../server/images/" + movie.image

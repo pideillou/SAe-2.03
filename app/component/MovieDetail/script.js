@@ -18,6 +18,10 @@ function getMovieLabel(movie) {
 MovieDetail.format = function (movie) {
   let html = template;
   html = html.replace(
+    /{{newHidden}}/g,
+    movie.is_new ? "" : 'aria-hidden="true" hidden',
+  );
+  html = html.replace(
     "{{image}}",
     movie.image
       ? "../server/images/" + movie.image
@@ -29,7 +33,7 @@ MovieDetail.format = function (movie) {
     movie.description || "Pas de description.",
   );
   html = html.replace("{{director}}", movie.director || "-");
-  html = html.replace("{{year}}", movie.year || "-");
+  html = html.replace("{{year}}", movie.year_movie || "-");
   html = html.replace("{{category}}", movie.category || "-");
   html = html.replace("{{minAge}}", movie.min_age || "-");
 

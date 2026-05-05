@@ -1,7 +1,10 @@
 <div class="movie-detail">
   <img class="movie-detail__image" src="{{image}}" alt="Affiche du film" />
   <div class="movie-detail__info">
-    <h2 class="movie-detail__title">{{name}}</h2>
+    <div class="movie-detail__title-row">
+      <h2 class="movie-detail__title">{{name}}</h2>
+      <span class="movie-tag movie-tag--new" {{newHidden}}>new</span>
+    </div>
     <div class="movie-detail__desc">{{description}}</div>
     <div class="movie-detail__meta">
       Realisateur : <span class="movie-detail__director">{{director}}</span> |
@@ -9,6 +12,39 @@
       <span class="movie-detail__category">{{category}}</span> | Age min :
       <span class="movie-detail__minage">{{minAge}}</span>
     </div>
+
+    <div class="movie-detail__rating" style="margin-top: 0.25rem">
+      <div id="movieRatingSummary" style="margin-bottom: 0.5rem">
+        Note moyenne : <strong id="movieRatingAvg">-</strong> / 10 (<span
+          id="movieRatingCount"
+          >0</span
+        >
+        avis)
+      </div>
+      <div id="movieUserRatingArea"></div>
+      <div
+        id="movieRatingMessage"
+        style="margin-top: 0.5rem; color: #155724; display: none"
+      ></div>
+    </div>
+
     <div class="movie-detail__trailer">{{trailer}}</div>
+
+    <section
+      class="movie-detail__comments"
+      aria-label="Commentaires sur le film"
+    >
+      <h3 class="movie-detail__section-title">Commentaires</h3>
+      <div
+        id="movieCommentsSummary"
+        class="movie-detail__comments-summary"
+      ></div>
+      <div id="movieCommentsList" class="movie-detail__comments-list"></div>
+      <div
+        id="movieCommentFormArea"
+        class="movie-detail__comment-form-area"
+      ></div>
+      <div id="movieCommentMessage" class="movie-detail__comment-message"></div>
+    </section>
   </div>
 </div>
