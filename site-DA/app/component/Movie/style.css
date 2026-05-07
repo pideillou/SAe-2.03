@@ -1,0 +1,343 @@
+.catalog-hero {
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.8rem;
+  padding: 2.3rem 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.catalog-hero::after {
+  display: none;
+}
+
+.catalog-hero__kicker {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.catalog-hero__title {
+  margin: 0.2rem 0 0.25rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-fg);
+}
+
+.catalog-hero__text {
+  margin: 0;
+  max-width: 40rem;
+  color: var(--color-gray);
+  line-height: 1.55;
+}
+
+.movie-category {
+  margin-top: 2.3rem;
+  border-top: 1px solid var(--color-gray);
+}
+
+.movie-category__title {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  margin-top: 1rem;
+  color: var(--color-fg);
+}
+
+.movie-carousel {
+  position: relative;
+}
+
+.movie-carousel .movie-grid {
+  padding-left: 2.7rem;
+  padding-right: 2.7rem;
+}
+
+.movie-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.7rem;
+  height: 3.9rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background: rgba(24, 24, 24, 0.9);
+  color: #fff;
+  cursor: pointer;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.2s ease;
+}
+
+.movie-carousel__arrow svg {
+  width: 1.8rem;
+  height: 1.8rem;
+  fill: currentColor;
+}
+
+.movie-carousel__arrow--left {
+  left: 0;
+}
+
+.movie-carousel__arrow--right {
+  right: 0;
+}
+
+.movie-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.1rem;
+  padding: 0.4rem 0 0.8rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) transparent;
+}
+
+.movie-card {
+  flex: 0 0 13rem;
+  width: 13rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  margin: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+  scroll-snap-align: start;
+}
+
+.movie-tag {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.movie-tag--new {
+  background: #111111;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.movie-card:hover img {
+  transform: scale(1.05);
+}
+
+.movie-card:hover .movie-play {
+  transform: scale(1.15);
+  background-color: var(--color-fg);
+  color: var(--color-bg-play);
+}
+
+.movie-card img {
+  width: 100%;
+  aspect-ratio: 2/3;
+  flex: 0 0 auto;
+  object-fit: cover;
+  margin: 0;
+  display: block;
+}
+
+.movie-info {
+  background: var(--color-card-bg);
+  color: var(--color-fg);
+  padding: 0.8rem;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.movie-card:hover .movie-info {
+  background: var(--color-card-hover);
+}
+
+.movie-title {
+  color: var(--color-fg);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-bottom: 0.35rem;
+  text-align: left;
+  overflow: hidden;
+}
+
+.movie-desc {
+  color: var(--color-gray);
+  font-size: 0.88rem;
+  text-align: left;
+  line-height: 1.45;
+  margin-top: 0;
+  display: block;
+  overflow: hidden;
+  max-height: calc(1.45em * 3);
+}
+
+.movie-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.movie-badge {
+  display: inline-block;
+  padding: 0.18rem 0.5rem;
+  border-radius: 0.2rem;
+  background: rgba(102, 102, 102, 0.1);
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.movie-play {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  color: var(--color-fg);
+  display: grid;
+  place-items: center;
+  background: var(--color-bg-play);
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.movie-play:hover {
+  background-color: var(--color-fg);
+  color: var(--color-bg-play);
+}
+
+.movie-favorite {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-white);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+  padding: 0;
+}
+
+.movie-favorite:hover {
+  background-color: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+
+.movie-favorite--active {
+  background: rgba(255, 182, 193, 0.95);
+  transform: scale(1.03);
+}
+
+/* SVG sizing and color rules for favorite button */
+.movie-favorite svg {
+  display: block;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* default: outline heart (stroke visible, no fill) */
+.movie-favorite:not(.movie-favorite--active) svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+/* active: filled red heart */
+.movie-favorite.movie-favorite--active svg path {
+  fill: currentColor;
+  stroke: none;
+}
+
+.movie-favorite {
+  color: #666666;
+}
+.movie-favorite.movie-favorite--active {
+  color: #e11;
+}
+
+.no-movie-msg {
+  color: var(--color-fg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  margin: 2rem auto;
+  grid-column: 1/-1;
+}
+
+@media (max-width: 700px) {
+  .catalog-hero {
+    margin-top: 0.4rem;
+    margin-bottom: 1.5rem;
+    padding: 1.3rem 0.95rem;
+  }
+
+  .movie-category {
+    margin-top: 1.7rem;
+  }
+
+  .movie-category__title {
+    font-size: 1.15rem;
+  }
+
+  .movie-grid {
+    gap: 0.85rem;
+  }
+
+  .movie-carousel .movie-grid {
+    padding-left: 2.2rem;
+    padding-right: 2.2rem;
+  }
+
+  .movie-carousel__arrow {
+    width: 2.2rem;
+    height: 3.3rem;
+  }
+
+  .movie-card {
+    flex-basis: 10.5rem;
+    width: 10.5rem;
+  }
+}

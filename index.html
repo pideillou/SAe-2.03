@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="site-base/server/images/logo.png" />
+    <title>Accueil</title>
+    <style>
+      :root {
+        --bg: #0f1115;
+        --panel: #171a21;
+        --text: #e8ecf1;
+        --muted: #a8b0bb;
+        --btn: #222734;
+        --btn-hover: #2a3142;
+        --border: #313849;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial,
+          sans-serif;
+        background: radial-gradient(
+          circle at top,
+          #161b25 0%,
+          var(--bg) 45%,
+          #0b0d12 100%
+        );
+        color: var(--text);
+      }
+
+      main {
+        width: min(92vw, 760px);
+        background: color-mix(in srgb, var(--panel) 92%, black);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 36px 28px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+
+      p {
+        margin: 0 0 26px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--btn);
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .btn:hover {
+        background: var(--btn-hover);
+        border-color: #3e485e;
+        transform: translateY(-1px);
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Bienvenue</h1>
+      <p>Accédez rapidement aux différentes sections de votre site.</p>
+
+      <nav class="grid" aria-label="Navigation principale">
+        <a class="btn" href="site-base/app/">Site de base - App</a>
+        <a class="btn" href="rapport.html">Rapport</a>
+        <a class="btn" href="site-DA/app/">Site RTE like - App</a>
+        <a class="btn" href="site-base/admin/">Site de base - Admin</a>
+        <a class="btn" href="rapport-realtime.html">Rapport journalier</a>
+        <a class="btn" href="site-DA/admin/">Site RTE like - Admin</a>
+      </nav>
+    </main>
+  </body>
+</html>

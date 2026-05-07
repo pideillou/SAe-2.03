@@ -1,0 +1,76 @@
+<form
+  id="profileForm"
+  class="profile-form"
+  onsubmit="{{handler}}; return false;"
+>
+  <div class="profile-form__hero">
+    <div class="profile-form__avatar" aria-hidden="true">
+      <img src="../server/images/logo.png" alt="Logo Flouflix" />
+    </div>
+    <div>
+      <p class="profile-form__kicker">Gestion des accès</p>
+      <p class="profile-form__subtitle">
+        Crée ou modifie un profil utilisateur
+      </p>
+    </div>
+  </div>
+
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileToEdit"
+      >Profil à modifier</label
+    >
+    <select
+      class="profile-form__input"
+      id="profileToEdit"
+      name="profile_to_edit"
+      onchange="{{handlerSelectProfile}}"
+    >
+      {{profileOptions}}
+    </select>
+  </div>
+
+  <input type="hidden" id="profileId" name="id" value="{{profileId}}" />
+
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileName">Nom du profil *</label>
+    <input
+      class="profile-form__input"
+      type="text"
+      id="profileName"
+      name="name"
+      required
+      value="{{profileName}}"
+      placeholder="Ex: Enfants, Adultes, Adolescents..."
+    />
+  </div>
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileImage"
+      >Image / Avatar (optionnel)</label
+    >
+    <input
+      class="profile-form__input"
+      type="text"
+      id="profileImage"
+      name="image"
+      value="{{profileImage}}"
+      placeholder="Ex: avatar_kids.jpg"
+    />
+  </div>
+  <div class="profile-form__group">
+    <label class="profile-form__label" for="profileMinAge"
+      >Restriction d'âge minimum *</label
+    >
+    <select
+      class="profile-form__input"
+      id="profileMinAge"
+      name="min_age"
+      required
+    >
+      {{minAgeOptions}}
+    </select>
+  </div>
+
+  <button class="profile-form__button" type="submit">
+    Enregistrer le profil
+  </button>
+</form>

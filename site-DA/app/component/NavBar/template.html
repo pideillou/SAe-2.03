@@ -1,0 +1,100 @@
+<nav class="navbar font-sans">
+  <div class="navbar__logo">
+    <a class="navbar__brand" href="#" aria-label="Retour accueil">FLOUFLIX</a>
+  </div>
+  <ul class="navbar__links">
+    <li class="navbar__link active" onclick="{{hHome}}">Accueil</li>
+    <li class="navbar__link" onclick="{{hFavorites}}">Favoris</li>
+    <li class="navbar__link" onclick="{{hStatistics}}">Statistiques</li>
+    <li class="navbar__link" onclick="{{hAbout}}">About</li>
+  </ul>
+  <div class="navbar__actions">
+    <button
+      class="navbar__action navbar__action--search"
+      type="button"
+      data-navbar-toggle-search
+      aria-controls="navbarSearchPanel"
+      aria-expanded="false"
+    >
+      <svg
+        width="24"
+        height="24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+      <span>Search</span>
+    </button>
+    <button
+      class="navbar__action navbar__action--login"
+      type="button"
+      data-navbar-toggle-profiles
+      aria-controls="navbarProfilesPanel"
+      aria-expanded="false"
+    >
+      <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 20c0-4 8-4 8-4s8 0 8 4" />
+      </svg>
+      <span>Login</span>
+    </button>
+  </div>
+</nav>
+
+<div
+  class="navbar__drawer navbar__drawer--search"
+  id="navbarSearchPanel"
+  hidden
+>
+  <div class="navbar__search">
+    <svg
+      class="navbar__search-icon"
+      width="26"
+      height="26"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+    <input
+      type="text"
+      class="navbar__search-input"
+      id="searchInput"
+      placeholder="Rechercher un film..."
+      aria-label="Rechercher un film par titre"
+      onkeyup="C.handlerSearch()"
+    />
+    <button
+      class="navbar__search-button"
+      onclick="C.handlerSearch()"
+      type="button"
+      aria-label="Valider la recherche"
+    >
+      Rechercher
+    </button>
+  </div>
+</div>
+
+<div
+  class="navbar__drawer navbar__drawer--profiles"
+  id="navbarProfilesPanel"
+  hidden
+>
+  <section class="navbar__profiles" aria-label="Choix du profil">
+    <div class="navbar__profiles-head">
+      <span class="navbar__profiles-label">Profil actif</span>
+      <strong class="navbar__profiles-current">{{currentProfileLabel}}</strong>
+    </div>
+    <div class="navbar__profiles-list">{{profiles}}</div>
+  </section>
+</div>

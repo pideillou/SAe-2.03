@@ -1,0 +1,114 @@
+.comment-moderation {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: 0.8rem;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.comment-moderation__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.comment-moderation__kicker {
+  margin: 0 0 0.15rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.comment-moderation__title {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--color-white);
+}
+
+.comment-moderation__refresh,
+.comment-moderation__approve,
+.comment-moderation__delete {
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  padding: 0.75rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.comment-moderation__refresh {
+  background: #111111;
+  color: var(--color-white);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.comment-moderation__message {
+  min-height: 1.2rem;
+  color: #8ee69d;
+  font-weight: 600;
+}
+
+.comment-moderation__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.comment-moderation__item {
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: #171717;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.comment-moderation__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  color: var(--color-gray-400);
+  font-size: 0.92rem;
+}
+
+.comment-moderation__status {
+  color: var(--color-gray-300);
+}
+
+.comment-moderation__text {
+  white-space: pre-wrap;
+  line-height: 1.55;
+  color: var(--color-gray-100);
+}
+
+.comment-moderation__actions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.comment-moderation__approve {
+  background: rgba(76, 175, 80, 0.14);
+  color: #8ee69d;
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.comment-moderation__delete {
+  background: rgba(244, 67, 54, 0.14);
+  color: #ff9890;
+  border-color: rgba(244, 67, 54, 0.32);
+}
+
+.comment-moderation__empty {
+  color: var(--color-gray-500);
+  padding: 1rem 0;
+}

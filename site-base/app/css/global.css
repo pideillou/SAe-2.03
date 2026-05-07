@@ -1,0 +1,20 @@
+@import "./reset.css";
+@import "./variables.css";
+@import "./utilities.css";
+
+@import "../component/NavBar/style.css";
+@import "../component/Movie/style.css";
+@import "../component/MovieDetail/style.css";
+
+body {
+  min-height: 100vh;
+  color: var(--color-fg);
+  font-family: var(--ff-sans);
+  background: var(--color-bg);
+}
+
+#content {
+  width: min(94vw, 82rem);
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}

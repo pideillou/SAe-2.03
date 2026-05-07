@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <title>Flouflix</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/global.css" />
+    <link rel="icon" type="image/png" href="../server/images/logo.png" />
+  </head>
+
+  <body>
+    <header id="header"></header>
+
+    <section class="catalog-hero" aria-label="Flouflix selection du moment">
+      <p class="catalog-hero__kicker">Plateforme de streaming</p>
+      <h1 class="catalog-hero__title">FLOUFLIX</h1>
+      <p class="catalog-hero__text">
+        Explore des catalogues par univers, decouvre des fiches détaillées et
+        lance ta prochaine soirée cinéma.
+      </p>
+    </section>
+
+    <section id="content"></section>
+
+    <script type="module">
+      import { NavBar } from "./component/NavBar/script.js";
+      import { DataMovie } from "./data/dataMovie.js";
+      import { DataProfile } from "./data/dataProfile.js";
+      import { MovieCategory } from "./component/MovieCategory/script.js";
+      import { MovieDetail } from "./component/MovieDetail/script.js";
+      import { Favorites } from "./component/Favorites/script.js";
+      import { Statistics } from "./component/Statistics/script.js";
+
+      window.C = {};
+      window.V = {};
+      C.activeProfileId = null;
+      C.profiles = [];
+      C.favorites = [];
+      C.featured = [];
+      C.menuRenderVersion = 0;
+      C.favoriteMessage = "";
+
+      C.handlerAbout = function () {
+        alert("Ceci est une base de projet pour la SAE2.03. Bonne chance !");
+      };
+
+      C.handlerSelectProfile = function (profileId) {
+        C.activeProfileId = profileId;
+        V.renderNavBar();
+        V.loadFavorites();
+        V.loadFeaturedMovies();
+        V.renderMenu();
+      };
+
+      C.closeNavbarPanels = function () {
+        const searchPanel = document.querySelector("#navbarSearchPanel");
+        const profilesPanel = document.querySelector("#navbarProfilesPanel");
+        const searchButton = document.querySelector(
+          "[data-navbar-toggle-search]",
+        );
+        const profileButton = document.querySelector(
+          "[data-navbar-toggle-profiles]",
+        );
+
+        if (searchPanel) searchPanel.hidden = true;
+        if (profilesPanel) profilesPanel.hidden = true;
+        if (searchButton) searchButton.setAttribute("aria-expanded", "false");
+        if (profileButton) profileButton.setAttribute("aria-expanded", "false");
+      };
+
+      C.toggleNavbarPanel = function (panelId, buttonSelector) {
+        const panel = document.querySelector(panelId);
+        const button = document.querySelector(buttonSelector);
+        const otherPanelId =
+          panelId === "#navbarSearchPanel"
+            ? "#navbarProfilesPanel"
+            : "#navbarSearchPanel";
+        const otherPanel = document.querySelector(otherPanelId);
+        const otherButton = document.querySelector(
+          buttonSelector === "[data-navbar-toggle-search]"
+            ? "[data-navbar-toggle-profiles]"
+            : "[data-navbar-toggle-search]",
+        );
+
+        if (!panel) return;
+
+        const nextState = panel.hidden;
+        if (otherPanel) otherPanel.hidden = true;
+        if (otherButton) otherButton.setAttribute("aria-expanded", "false");
+
+        panel.hidden = !nextState;
+        if (button) button.setAttribute("aria-expanded", String(nextState));
+
+        if (nextState && panelId === "#navbarSearchPanel") {
+          const input = panel.querySelector("#searchInput");
+          if (input) input.focus();
+        }
+      };
+
+      C.updateCarouselState = function (carousel) {
+        if (!carousel) return;
+
+        const grid = carousel.querySelector(".movie-grid");
+        if (!grid) return;
+
+        const maxScrollLeft = Math.max(0, grid.scrollWidth - grid.clientWidth);
+        const atStart = grid.scrollLeft <= 2;
+        const atEnd = grid.scrollLeft >= maxScrollLeft - 2;
+
+        carousel.classList.toggle("movie-carousel--at-start", atStart);
+        carousel.classList.toggle("movie-carousel--at-end", atEnd);
+
+        const leftArrow = carousel.querySelector(
+          ".movie-carousel__arrow--left",
+        );
+        const rightArrow = carousel.querySelector(
+          ".movie-carousel__arrow--right",
+        );
+
+        if (leftArrow) leftArrow.disabled = atStart;
+        if (rightArrow) rightArrow.disabled = atEnd;
+      };
+
+      C.initMovieCarousels = function () {
+        const carousels = document.querySelectorAll(".movie-carousel");
+
+        for (const carousel of carousels) {
+          const grid = carousel.querySelector(".movie-grid");
+          if (!grid) continue;
+
+          if (!grid.dataset.carouselBound) {
+            grid.addEventListener("scroll", function () {
+              C.updateCarouselState(carousel);
+            });
+            grid.dataset.carouselBound = "1";
+          }
+
+          C.updateCarouselState(carousel);
+        }
+      };
+
+      C.scrollCarousel = function (arrowButton, direction) {
+        const carousel = arrowButton
+          ? arrowButton.closest(".movie-carousel")
+          : null;
+        if (!carousel) return;
+
+        const grid = carousel.querySelector(".movie-grid");
+        if (!grid) return;
+
+        const step = Math.max(220, Math.floor(grid.clientWidth * 0.75));
+        grid.scrollBy({ left: step * direction, behavior: "smooth" });
+
+        setTimeout(function () {
+          C.updateCarouselState(carousel);
+        }, 260);
+      };
+
+      C.getActiveProfileAge = function () {
+        if (!C.activeProfileId) {
+          return 0;
+        }
+
+        let activeProfile = C.profiles.find(function (profile) {
+          return String(profile.id) === String(C.activeProfileId);
+        });
+
+        let age = activeProfile ? Number(activeProfile.min_age) : 0;
+        return Number.isNaN(age) ? 0 : age;
+      };
+
+      C.handlerHome = function () {
+        let searchInput = document.querySelector("#searchInput");
+        if (searchInput) {
+          searchInput.value = "";
+        }
+        C.closeNavbarPanels();
+        V.renderMenu();
+        return false;
+      };
+
+      C.handlerFavorites = function () {
+        C.closeNavbarPanels();
+        V.renderFavorites();
+        return false;
+      };
+
+      C.handlerStatistics = function () {
+        C.closeNavbarPanels();
+        V.renderStatistics();
+        return false;
+      };
+
+      C.handlerDetail = async function (id) {
+        let movie = await DataMovie.requestMovieDetails(id);
+        if (!movie || movie.error) {
+          V.renderError("Erreur lors du chargement des details du film.");
+          return;
+        }
+        V.renderMovieDetail(movie);
+      };
+
+      C.handlerAddFavorite = async function (movieId) {
+        if (!C.activeProfileId) {
+          alert("Veuillez selectionner un profil.");
+          return;
+        }
+
+        let result = await DataMovie.addFavorite(C.activeProfileId, movieId);
+        if (result.error) {
+          alert(result.error);
+          return;
+        }
+
+        await V.loadFavorites();
+        C.favoriteMessage =
+          result.success || "Le film a ete ajoute a vos favoris.";
+        V.renderMessage();
+        V.renderMenu();
+      };
+
+      C.handlerRemoveFavorite = async function (movieId) {
+        if (!C.activeProfileId) {
+          alert("Veuillez selectionner un profil.");
+          return;
+        }
+
+        let result = await DataMovie.removeFavorite(C.activeProfileId, movieId);
+        if (result.error) {
+          alert(result.error);
+          return;
+        }
+
+        await V.loadFavorites();
+        C.favoriteMessage =
+          result.success || "Le film a ete supprime de vos favoris.";
+        V.renderMessage();
+        V.renderMenu();
+      };
+
+      C.handlerSearch = async function () {
+        let searchInput = document.querySelector("#searchInput");
+        if (!searchInput) {
+          return;
+        }
+
+        let query = searchInput.value.trim();
+        if (query === "") {
+          V.renderMenu();
+          return;
+        }
+
+        let ageLimit = C.getActiveProfileAge();
+        let results = await DataMovie.searchMovies(query, ageLimit);
+
+        if (!results || results.error) {
+          V.renderSearchResults([], query);
+          return;
+        }
+
+        V.renderSearchResults(results, query);
+      };
+
+      C.start = function () {
+        V.renderApp();
+      };
+
+      V.renderNavBar = function () {
+        let header = document.querySelector("#header");
+        header.innerHTML = NavBar.format(
+          "C.handlerAbout()",
+          "C.handlerHome()",
+          "C.handlerFavorites()",
+          "C.handlerStatistics()",
+          C.profiles,
+          C.activeProfileId,
+        );
+
+        let brand = header.querySelector(".navbar__brand");
+        if (brand) {
+          brand.addEventListener("click", function (event) {
+            event.preventDefault();
+            C.handlerHome();
+          });
+        }
+
+        const searchButton = header.querySelector(
+          "[data-navbar-toggle-search]",
+        );
+        const profileButton = header.querySelector(
+          "[data-navbar-toggle-profiles]",
+        );
+
+        if (searchButton) {
+          searchButton.addEventListener("click", function () {
+            C.toggleNavbarPanel(
+              "#navbarSearchPanel",
+              "[data-navbar-toggle-search]",
+            );
+          });
+        }
+
+        if (profileButton) {
+          profileButton.addEventListener("click", function () {
+            C.toggleNavbarPanel(
+              "#navbarProfilesPanel",
+              "[data-navbar-toggle-profiles]",
+            );
+          });
+        }
+      };
+
+      V.renderApp = async function () {
+        let profiles = await DataProfile.read();
+        if (Array.isArray(profiles)) {
+          C.profiles = profiles;
+          if (!C.activeProfileId && profiles.length > 0) {
+            C.activeProfileId = profiles[0].id;
+          }
+        }
+
+        V.renderNavBar();
+        await V.loadFavorites();
+        await V.loadFeaturedMovies();
+        V.renderMenu();
+      };
+
+      V.loadFavorites = async function () {
+        if (!C.activeProfileId) {
+          C.favorites = [];
+          return;
+        }
+
+        let favorites = await DataMovie.getFavorites(C.activeProfileId);
+        if (Array.isArray(favorites)) {
+          C.favorites = favorites;
+        } else {
+          C.favorites = [];
+        }
+      };
+
+      V.loadFeaturedMovies = async function () {
+        let ageLimit = C.getActiveProfileAge();
+        let featured = await DataMovie.getFeaturedMovies(ageLimit);
+        if (Array.isArray(featured)) {
+          C.featured = featured;
+        } else {
+          C.featured = [];
+        }
+      };
+
+      V.renderMessage = function () {
+        if (!C.favoriteMessage) return;
+
+        let msg = document.querySelector("#favoriteMessage");
+        if (!msg) {
+          let content = document.querySelector("#content");
+          msg = document.createElement("div");
+          msg.id = "favoriteMessage";
+          msg.style.cssText =
+            "background:#d4edda;color:#155724;padding:10px;border-radius:4px;margin-bottom:20px;";
+          content.insertBefore(msg, content.firstChild);
+        }
+
+        msg.textContent = C.favoriteMessage;
+        setTimeout(function () {
+          C.favoriteMessage = "";
+          if (msg) msg.style.display = "none";
+        }, 3000);
+      };
+
+      V.renderMenu = async function () {
+        const renderVersion = ++C.menuRenderVersion;
+        const requestedProfileId = C.activeProfileId;
+        let content = document.querySelector("#content");
+        content.innerHTML = "";
+
+        let ageLimit = C.getActiveProfileAge();
+        let grouped = await DataMovie.requestMoviesByCategory(ageLimit);
+
+        if (
+          renderVersion !== C.menuRenderVersion ||
+          String(requestedProfileId) !== String(C.activeProfileId)
+        ) {
+          return;
+        }
+
+        if (!grouped || grouped.error) {
+          V.renderError("Erreur lors du chargement des films.");
+          return;
+        }
+
+        let html = "";
+
+        // Affichage uniquement des films mis en avant et des catégories, PAS les favoris
+        if (C.featured && C.featured.length > 0) {
+          html += MovieCategory.format(
+            `Films mis en avant`,
+            C.featured,
+            C.favorites,
+          );
+        } else {
+          html +=
+            '<section class="movie-category" style="margin-bottom: 2rem;"><h2 class="movie-category__title">Films mis en avant</h2><div style="color:#999999;text-align:center;padding:2rem;">Aucun film mis en avant pour le moment.</div></section>';
+        }
+
+        if (Object.keys(grouped).length === 0) {
+          html +=
+            '<div style="color:#999999;text-align:center;padding:2rem;">Aucun film disponible pour votre tranche d\'age.</div>';
+        } else {
+          for (let category in grouped) {
+            html += MovieCategory.format(
+              category,
+              grouped[category],
+              C.favorites,
+            );
+          }
+        }
+        content.innerHTML = html;
+        C.initMovieCarousels();
+      };
+
+      V.escapeHtml = function (value) {
+        return String(value ?? "").replace(/[&<>"]|'/g, function (character) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[character];
+        });
+      };
+
+      V.formatCommentDate = function (value) {
+        if (!value) return "";
+        const date = new Date(String(value).replace(" ", "T"));
+        if (Number.isNaN(date.getTime())) {
+          return String(value);
+        }
+
+        return new Intl.DateTimeFormat("fr-FR", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(date);
+      };
+
+      V.renderMovieRatings = async function (movieId) {
+        const rating = await DataMovie.getMovieRating(
+          movieId,
+          C.activeProfileId || 0,
+        );
+        const avgEl = document.querySelector("#movieRatingAvg");
+        const cntEl = document.querySelector("#movieRatingCount");
+        const userArea = document.querySelector("#movieUserRatingArea");
+        const msgEl = document.querySelector("#movieRatingMessage");
+
+        if (!rating || rating.error) {
+          if (avgEl) avgEl.textContent = "-";
+          if (cntEl) cntEl.textContent = "0";
+          if (userArea) userArea.innerHTML = "";
+          return;
+        }
+
+        if (avgEl) avgEl.textContent = rating.average || 0;
+        if (cntEl) cntEl.textContent = rating.count || 0;
+
+        if (!C.activeProfileId) {
+          if (userArea) {
+            userArea.innerHTML =
+              '<div style="color:#666;">Connectez-vous pour noter ce film.</div>';
+          }
+          return;
+        }
+
+        if (rating.user_score !== undefined && rating.user_score !== null) {
+          if (userArea) {
+            userArea.innerHTML =
+              '<div style="color:#333;">Vous avez noté ce film : <strong>' +
+              rating.user_score +
+              "/10</strong></div>";
+          }
+          return;
+        }
+
+        if (userArea) {
+          userArea.innerHTML =
+            '<div class="movie-detail__comment-form-label">Votre note</div>' +
+            '<div class="movie-detail__comment-form-actions">' +
+            '<select id="movieScoreSelect">' +
+            Array.from(
+              { length: 11 },
+              (_, i) => '<option value="' + i + '">' + i + "</option>",
+            ).join("") +
+            "</select>" +
+            '<button id="movieScoreBtn" class="movie-detail__comment-button" type="button">Noter</button>' +
+            "</div>";
+
+          const btn = document.querySelector("#movieScoreBtn");
+          if (btn) {
+            btn.addEventListener("click", async function () {
+              const sel = document.querySelector("#movieScoreSelect");
+              const score = Number(sel.value);
+              const res = await DataMovie.addRating(
+                C.activeProfileId,
+                movieId,
+                score,
+              );
+              if (res && res.error) {
+                alert(res.error);
+                return;
+              }
+
+              if (msgEl) {
+                msgEl.style.display = "block";
+                msgEl.textContent =
+                  res.success || "Votre note a ete enregistree.";
+              }
+
+              await V.renderMovieRatings(movieId);
+            });
+          }
+        }
+      };
+
+      V.renderMovieComments = async function (movie) {
+        const commentsBox = document.querySelector("#movieCommentsList");
+        const summaryBox = document.querySelector("#movieCommentsSummary");
+        const formArea = document.querySelector("#movieCommentFormArea");
+        const messageBox = document.querySelector("#movieCommentMessage");
+
+        if (!commentsBox || !summaryBox || !formArea || !messageBox) {
+          return;
+        }
+
+        const comments = await DataMovie.getMovieComments(movie.id);
+        if (!comments || comments.error) {
+          summaryBox.textContent = "Impossible de charger les commentaires.";
+          commentsBox.innerHTML = "";
+          formArea.innerHTML = "";
+          messageBox.textContent = "";
+          return;
+        }
+
+        summaryBox.textContent =
+          comments.length > 0
+            ? comments.length +
+              " commentaire" +
+              (comments.length > 1 ? "s" : "")
+            : "";
+
+        if (!Array.isArray(comments) || comments.length === 0) {
+          commentsBox.innerHTML =
+            '<div class="movie-detail__comment-empty">Aucun commentaire pour ce film. Soyez le premier à en laisser un !</div>';
+        } else {
+          commentsBox.innerHTML = comments
+            .map(function (comment) {
+              return (
+                '<article class="movie-detail__comment-item">' +
+                '<div class="movie-detail__comment-header">' +
+                '<span class="movie-detail__comment-profile">' +
+                V.escapeHtml(comment.profile_name || "Profil inconnu") +
+                '</span><span class="movie-detail__comment-date">' +
+                V.formatCommentDate(comment.created_at) +
+                "</span></div>" +
+                '<div class="movie-detail__comment-text">' +
+                V.escapeHtml(comment.comment_text || "") +
+                "</div></article>"
+              );
+            })
+            .join("");
+        }
+
+        if (!C.activeProfileId) {
+          formArea.innerHTML =
+            '<div style="color:#666;">Connectez-vous à un profil pour laisser un commentaire.</div>';
+          messageBox.textContent = "";
+          return;
+        }
+
+        formArea.innerHTML =
+          '<label class="movie-detail__comment-form-label" for="movieCommentText">Ajouter un commentaire</label>' +
+          '<textarea id="movieCommentText" class="movie-detail__comment-form-textarea" maxlength="1000" placeholder="Écrivez votre commentaire ici..."></textarea>' +
+          '<div class="movie-detail__comment-form-actions">' +
+          '<button id="movieCommentBtn" class="movie-detail__comment-button" type="button">Publier</button>' +
+          "</div>";
+
+        const submitButton = document.querySelector("#movieCommentBtn");
+        if (submitButton) {
+          submitButton.addEventListener("click", async function () {
+            const textArea = document.querySelector("#movieCommentText");
+            const commentText = textArea ? textArea.value.trim() : "";
+
+            if (commentText === "") {
+              alert("Le commentaire ne peut pas être vide.");
+              return;
+            }
+
+            const result = await DataMovie.addComment(
+              C.activeProfileId,
+              movie.id,
+              commentText,
+            );
+
+            if (result && result.error) {
+              alert(result.error);
+              return;
+            }
+
+            if (messageBox) {
+              messageBox.textContent =
+                result.success || "Votre commentaire a ete enregistre.";
+            }
+
+            await V.renderMovieComments(movie);
+          });
+        }
+      };
+
+      V.renderMovieDetail = async function (movie) {
+        let content = document.querySelector("#content");
+        content.innerHTML = MovieDetail.format(movie);
+        await V.renderMovieRatings(movie.id);
+        await V.renderMovieComments(movie);
+      };
+
+      V.renderFavorites = function () {
+        let content = document.querySelector("#content");
+        if (!C.activeProfileId) {
+          content.innerHTML =
+            '<div style="color:#999999;text-align:center;padding:2rem;">Veuillez selectionner un profil pour voir vos favoris.</div>';
+          return;
+        }
+
+        content.innerHTML = Favorites.formatSimple(C.favorites);
+        C.initMovieCarousels();
+      };
+
+      V.renderStatistics = async function () {
+        let content = document.querySelector("#content");
+        let stats = await DataMovie.getStatistics();
+
+        if (stats.error) {
+          V.renderError("Erreur lors du chargement des statistiques.");
+          return;
+        }
+
+        content.innerHTML = Statistics.format(stats);
+      };
+
+      V.renderError = function (txt) {
+        let content = document.querySelector("#content");
+        content.innerHTML = '<div style="color:#999999">' + txt + "</div>";
+      };
+
+      V.renderSearchResults = function (results, query) {
+        let content = document.querySelector("#content");
+        let html = "";
+
+        html += '<div style="margin-bottom: 1.5rem;">';
+        html +=
+          '<h2 style="font-size: 1.3rem; margin-bottom: 0.5rem;">Résultats de recherche</h2>';
+        html +=
+          '<p style="color: #999999; font-size: 0.95rem;">Recherche : "<strong>' +
+          query +
+          '</strong>"</p>';
+        html += "</div>";
+
+        if (!Array.isArray(results) || results.length === 0) {
+          html +=
+            '<div style="color:#999999;text-align:center;padding:2rem;background:#f5f5f5;border-radius:4px;">';
+          html +=
+            '<p style="font-size: 1rem;">Aucun film ne correspond à votre recherche.</p>';
+          html +=
+            '<p style="font-size: 0.9rem; margin-top: 0.5rem;">Essayez une autre requête ou consultez le catalogue complet.</p>';
+          html += "</div>";
+        } else {
+          html += MovieCategory.format(
+            "Résultats (" +
+              results.length +
+              " film" +
+              (results.length > 1 ? "s" : "") +
+              ")",
+            results,
+            C.favorites,
+          );
+        }
+
+        content.innerHTML = html;
+        C.initMovieCarousels();
+      };
+
+      C.start();
+    </script>
+  </body>
+</html>

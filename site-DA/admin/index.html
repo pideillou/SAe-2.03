@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin - Gestion des contenus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../app/css/variables.css" />
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./component/FeaturedMovieSearch/style.css" />
+    <link rel="stylesheet" href="./component/CommentModeration/style.css" />
+    <link rel="icon" type="image/png" href="../server/images/logo.png" />
+  </head>
+  <body>
+    <h1 class="admin-page-title">Admin - Gestion des contenus</h1>
+
+    <div class="admin-container">
+      <div class="admin-section">
+        <h2>Ajouter un film</h2>
+        <section id="logMovie"></section>
+        <section id="formMovie"></section>
+      </div>
+
+      <div class="admin-section">
+        <h2>Ajouter un profil utilisateur</h2>
+        <section id="logProfile"></section>
+        <section id="formProfile"></section>
+      </div>
+
+      <div class="admin-section">
+        <section id="featuredSearch"></section>
+        <section id="featuredLog"></section>
+      </div>
+    </div>
+
+    <script type="module">
+      import { MovieForm } from "./component/MovieForm/script.js";
+      import { ProfileForm } from "./component/ProfileForm/script.js";
+      import { FeaturedMovieSearch } from "./component/FeaturedMovieSearch/script.js";
+      import { CommentModeration } from "./component/CommentModeration/script.js";
+      import { Log } from "./component/Log/script.js";
+      import { DataMovie } from "./data/dataMovie.js";
+      import { DataComment } from "./data/dataComment.js";
+      import { DataProfile } from "./data/dataProfile.js";
+
+      window.C = {};
+      window.V = {};
+      C.profileList = [];
+      C.activeProfileId = "";
+      C.featuredSearchResults = [];
+      C.pendingComments = [];
+
+      const movieLog = Log.create();
+      const profileLog = Log.create();
+      const featuredLog = Log.create();
+
+      C.handlerAddMovie = async function () {
+        let form = document.querySelector("#movieForm");
+        let formData = new FormData(form);
+
+        let data = {
+          name: formData.get("title"),
+          director: formData.get("director"),
+          year: formData.get("year"),
+          length: formData.get("duration"),
+          description: formData.get("description"),
+          id_category: formData.get("category"),
+          image: formData.get("image"),
+          trailer: formData.get("trailer"),
+          min_age: formData.get("age"),
+        };
+
+        V.renderMovieLog("Ajout du film en cours...");
+        let res = await DataMovie.add(data);
+
+        if (res && res.success) {
+          V.renderMovieLog(res.success);
+          form.reset();
+          return;
+        }
+
+        V.renderMovieLog(
+          (res && res.error) || "Erreur lors de l'ajout du film.",
+        );
+      };
+
+      C.handlerSelectProfileToEdit = function (profileId) {
+        C.activeProfileId = profileId;
+        V.renderProfileForm(
+          "C.handlerSaveProfile()",
+          "C.handlerSelectProfileToEdit(this.value)",
+        );
+      };
+
+      C.loadProfiles = async function (selectedId) {
+        let profiles = await DataProfile.getAll();
+
+        if (!Array.isArray(profiles)) {
+          V.renderProfileLog(
+            (profiles && profiles.error) ||
+              "Erreur lors du chargement des profils.",
+          );
+          return;
+        }
+
+        C.profileList = profiles;
+        if (selectedId !== undefined) {
+          C.activeProfileId = selectedId;
+        }
+        return profiles;
+      };
+
+      C.handlerSaveProfile = async function () {
+        let form = document.querySelector("#profileForm");
+        let formData = new FormData(form);
+
+        let profileId = formData.get("id");
+
+        let data = {
+          id: profileId,
+          name: formData.get("name"),
+          image: formData.get("image"),
+          min_age: formData.get("min_age"),
+        };
+
+        V.renderProfileLog("Enregistrement du profil en cours...");
+        let res = await DataProfile.save(data);
+
+        if (res && res.success) {
+          V.renderProfileLog(res.success);
+          await C.loadProfiles(res.id || profileId || "");
+          V.renderProfileForm(
+            "C.handlerSaveProfile()",
+            "C.handlerSelectProfileToEdit(this.value)",
+          );
+          return;
+        }
+
+        V.renderProfileLog(
+          (res && res.error) || "Erreur lors de l'enregistrement du profil.",
+        );
+      };
+
+      C.handlerSearchFeaturedMovies = async function () {
+        let searchInput = document.querySelector("#featuredSearchInput");
+        if (!searchInput) {
+          return;
+        }
+
+        let query = searchInput.value.trim();
+        if (query === "") {
+          V.renderFeaturedResults([], query);
+          return;
+        }
+
+        V.renderFeaturedLog("Recherche en cours...");
+        let results = await DataMovie.searchMovies(query);
+
+        if (!results || results.error) {
+          V.renderFeaturedLog(
+            results && results.error
+              ? results.error
+              : "Erreur lors de la recherche.",
+          );
+          V.renderFeaturedResults([], query);
+          return;
+        }
+
+        C.featuredSearchResults = results;
+        V.renderFeaturedResults(results, query);
+        V.renderFeaturedLog("Recherche terminée.");
+      };
+
+      C.handlerToggleFeaturedStatus = async function (movieId, currentStatus) {
+        let newStatus = currentStatus ? 0 : 1;
+
+        V.renderFeaturedLog("Modification en cours...");
+        let res = await DataMovie.updateFeatured(movieId, newStatus);
+
+        if (res && res.success) {
+          V.renderFeaturedLog(res.success);
+          C.handlerSearchFeaturedMovies();
+          return;
+        }
+
+        V.renderFeaturedLog(
+          (res && res.error) || "Erreur lors de la modification du statut.",
+        );
+      };
+
+      C.handlerLoadPendingComments = async function () {
+        V.renderCommentModerationMessage("Chargement des commentaires...");
+        let comments = await DataComment.readPending();
+
+        if (!Array.isArray(comments)) {
+          V.renderCommentModerationMessage(
+            (comments && comments.error) ||
+              "Erreur lors du chargement des commentaires.",
+          );
+          V.renderCommentModerationResults([]);
+          return;
+        }
+
+        C.pendingComments = comments;
+        V.renderCommentModerationResults(comments);
+        V.renderCommentModerationMessage(
+          comments.length === 0
+            ? "Aucun commentaire à modérer pour le moment."
+            : comments.length +
+                " commentaire" +
+                (comments.length > 1 ? "s" : "") +
+                " en attente.",
+        );
+      };
+
+      C.handlerApproveComment = async function (idComment) {
+        V.renderCommentModerationMessage("Approbation en cours...");
+        let res = await DataComment.approve(idComment);
+
+        if (res && res.success) {
+          V.renderCommentModerationMessage(res.success);
+          await C.handlerLoadPendingComments();
+          return;
+        }
+
+        V.renderCommentModerationMessage(
+          (res && res.error) || "Erreur lors de l'approbation du commentaire.",
+        );
+      };
+
+      C.handlerDeleteComment = async function (idComment) {
+        V.renderCommentModerationMessage("Suppression en cours...");
+        let res = await DataComment.remove(idComment);
+
+        if (res && res.success) {
+          V.renderCommentModerationMessage(res.success);
+          await C.handlerLoadPendingComments();
+          return;
+        }
+
+        V.renderCommentModerationMessage(
+          (res && res.error) || "Erreur lors de la suppression du commentaire.",
+        );
+      };
+
+      C.start = async function () {
+        V.renderMovieForm("C.handlerAddMovie()");
+        V.renderMovieLog("Bienvenue sur le backoffice Flouflix.");
+        V.renderProfileLog(
+          "Chargez un profil existant ou creez-en un nouveau.",
+        );
+        await C.loadProfiles();
+        V.renderProfileForm(
+          "C.handlerSaveProfile()",
+          "C.handlerSelectProfileToEdit(this.value)",
+          C.profileList,
+          C.activeProfileId,
+        );
+        V.renderFeaturedSearch();
+        V.renderFeaturedLog(
+          "Recherchez des films pour gérer leur statut mis en avant.",
+        );
+        V.renderCommentModeration();
+        await C.handlerLoadPendingComments();
+      };
+
+      V.renderMovieLog = function (txt) {
+        let content = document.querySelector("#logMovie");
+        content.innerHTML = movieLog.format(txt);
+      };
+
+      V.renderProfileLog = function (txt) {
+        let content = document.querySelector("#logProfile");
+        content.innerHTML = profileLog.format(txt);
+      };
+
+      V.renderMovieForm = function (handler) {
+        let content = document.querySelector("#formMovie");
+        content.innerHTML = MovieForm.format(handler);
+      };
+
+      V.renderProfileForm = function (handler, handlerSelectProfile) {
+        let content = document.querySelector("#formProfile");
+        content.innerHTML = ProfileForm.format(
+          handler,
+          handlerSelectProfile,
+          C.profileList,
+          C.activeProfileId,
+        );
+      };
+
+      V.renderFeaturedSearch = function () {
+        let content = document.querySelector("#featuredSearch");
+        content.innerHTML = FeaturedMovieSearch.format();
+
+        let searchBtn = content.querySelector("#featuredSearchBtn");
+        let searchInput = content.querySelector("#featuredSearchInput");
+
+        if (searchBtn) {
+          searchBtn.addEventListener("click", function () {
+            C.handlerSearchFeaturedMovies();
+          });
+        }
+
+        if (searchInput) {
+          searchInput.addEventListener("keyup", function (e) {
+            if (e.key === "Enter") {
+              C.handlerSearchFeaturedMovies();
+            }
+          });
+        }
+      };
+
+      V.renderFeaturedLog = function (txt) {
+        let content = document.querySelector("#featuredLog");
+        content.innerHTML = featuredLog.format(txt);
+      };
+
+      V.renderFeaturedResults = function (results, query) {
+        let content = document.querySelector("#featuredSearch");
+        let resultsDiv = content.querySelector(".featured-search__results");
+
+        if (!resultsDiv) {
+          return;
+        }
+
+        resultsDiv.innerHTML = FeaturedMovieSearch.formatResults(results);
+
+        let buttons = resultsDiv.querySelectorAll(
+          ".featured-search__toggle-btn",
+        );
+        buttons.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            let movieId = this.getAttribute("data-movie-id");
+            let currentStatus = this.getAttribute("data-is-featured") === "1";
+            C.handlerToggleFeaturedStatus(movieId, currentStatus);
+          });
+        });
+      };
+
+      V.renderCommentModeration = function () {
+        let section = document.querySelector("#commentModeration");
+        if (!section) {
+          let container = document.createElement("div");
+          container.className = "admin-section";
+          container.innerHTML = '<section id="commentModeration"></section>';
+          document.querySelector(".admin-container").appendChild(container);
+          section = container.querySelector("#commentModeration");
+        }
+
+        section.innerHTML = CommentModeration.format();
+
+        let refreshBtn = section.querySelector("#commentModerationRefreshBtn");
+        if (refreshBtn) {
+          refreshBtn.addEventListener("click", function () {
+            C.handlerLoadPendingComments();
+          });
+        }
+      };
+
+      V.renderCommentModerationMessage = function (txt) {
+        let content = document.querySelector("#commentModerationMessage");
+        if (!content) return;
+        content.textContent = txt;
+      };
+
+      V.renderCommentModerationResults = function (comments) {
+        let list = document.querySelector("#commentModerationList");
+        if (!list) return;
+
+        list.innerHTML = CommentModeration.formatComments(comments);
+
+        let approveButtons = list.querySelectorAll(
+          ".comment-moderation__approve",
+        );
+        approveButtons.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            C.handlerApproveComment(this.getAttribute("data-comment-id"));
+          });
+        });
+
+        let deleteButtons = list.querySelectorAll(
+          ".comment-moderation__delete",
+        );
+        deleteButtons.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            C.handlerDeleteComment(this.getAttribute("data-comment-id"));
+          });
+        });
+      };
+
+      C.start();
+    </script>
+  </body>
+</html>
